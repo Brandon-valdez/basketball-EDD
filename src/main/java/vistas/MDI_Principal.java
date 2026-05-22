@@ -194,7 +194,7 @@ private void abrirVentana(javax.swing.JInternalFrame ventana) {
         desktopPane.setAlignmentX(220.0F);
         desktopPane.setAlignmentY(0.0F);
 
-        jPanelMenu.setBackground(new java.awt.Color(0, 0, 0));
+        jPanelMenu.setBackground(new java.awt.Color(51, 51, 51));
 
         jLabel1.setForeground(new java.awt.Color(255, 51, 0));
         jLabel1.setText("🏐");
