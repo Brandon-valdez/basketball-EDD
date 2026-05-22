@@ -10,79 +10,155 @@ public class MDI_Principal extends javax.swing.JFrame {
      */
     public MDI_Principal() {
         initComponents();
-        setLocationRelativeTo(null);
+    setLocationRelativeTo(null);
     setExtendedState(MAXIMIZED_BOTH);
 
+    // Sacar jPanelMenu del desktopPane
+    desktopPane.remove(jPanelMenu);
+
+    // Reconstruir el panel menú con orden correcto
+    jPanelMenu.removeAll();
+    jPanelMenu.setLayout(new java.awt.GridBagLayout());
+    jPanelMenu.setBackground(new java.awt.Color(0, 0, 0));
+    jPanelMenu.setPreferredSize(new java.awt.Dimension(140, 0));
+
+    java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gbc.insets = new java.awt.Insets(3, 8, 3, 8);
+    gbc.weightx = 1.0;
+
+    // Spacer arriba para empujar al centro
+    java.awt.GridBagConstraints spacer = new java.awt.GridBagConstraints();
+    spacer.gridx = 0; spacer.gridy = 0;
+    spacer.weighty = 1.0;
+    spacer.fill = java.awt.GridBagConstraints.VERTICAL;
+    jPanelMenu.add(new javax.swing.JLabel(), spacer);
+
+    // Logo
+    int row = 1;
+    gbc.gridy = row++; gbc.insets = new java.awt.Insets(2, 8, 0, 8);
+    jPanelMenu.add(jLabel1, gbc); // emoji balón
+
+    gbc.gridy = row++; gbc.insets = new java.awt.Insets(0, 8, 0, 8);
+    jPanelMenu.add(jLabel2, gbc); // BKB
+
+    gbc.gridy = row++; gbc.insets = new java.awt.Insets(0, 8, 0, 8);
+    jPanelMenu.add(jLabel3, gbc); // MANAGER
+
+    gbc.gridy = row++; gbc.insets = new java.awt.Insets(8, 8, 2, 8);
+    jPanelMenu.add(lblUsuario, gbc);
+
+    gbc.gridy = row++; gbc.insets = new java.awt.Insets(2, 8, 10, 8);
+    jPanelMenu.add(lblRol, gbc);
+
+    // Botones
+    gbc.insets = new java.awt.Insets(3, 8, 3, 8);
+    javax.swing.JButton[] botones = {
+        btnDashboard, btnUsuarios, btnEquipos, btnJugadores,
+        btnTorneos, btnPartidos, btnArbitros, btnEstadisticas,
+        btnMiEquipo, btnAlineacion, btnResultados
+    };
+    for (javax.swing.JButton btn : botones) {
+        gbc.gridy = row++;
+        jPanelMenu.add(btn, gbc);
+    }
+
+    // Cerrar sesión
+    gbc.gridy = row++; gbc.insets = new java.awt.Insets(10, 8, 8, 8);
+    jPanelMenu.add(btnCerrarSesion, gbc);
+
+    // Spacer abajo
+    java.awt.GridBagConstraints spacer2 = new java.awt.GridBagConstraints();
+    spacer2.gridx = 0; spacer2.gridy = row;
+    spacer2.weighty = 1.0;
+    spacer2.fill = java.awt.GridBagConstraints.VERTICAL;
+    jPanelMenu.add(new javax.swing.JLabel(), spacer2);
+
+    // Layout principal
+    getContentPane().setLayout(new java.awt.BorderLayout());
+    getContentPane().add(jPanelMenu, java.awt.BorderLayout.WEST);
+    getContentPane().add(desktopPane, java.awt.BorderLayout.CENTER);
+
     configurarRol();
+    //labels
+    lblUsuario.setForeground(java.awt.Color.WHITE);
+lblUsuario.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+lblUsuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
+lblRol.setForeground(java.awt.Color.WHITE);
+lblRol.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 11));
+lblRol.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 }
 
 private void configurarRol() {
 
-    modelo.Usuario usuarioActual = Sesion.getInstancia().getUsuario();
+    modelo.Usuario usuarioActual = util.Sesion.getInstancia().getUsuario();
+     // DEBUG - borralo después
+    System.out.println("Usuario: " + (usuarioActual != null ? usuarioActual.getNombre() : "NULL"));
+    System.out.println("Rol: " + (usuarioActual != null ? usuarioActual.getNombreRol() : "NULL"));
+    if (usuarioActual == null) return;
 
-    String rol = usuarioActual.getNombreRol();
-    String nombre = usuarioActual.getNombre();
+    String rol = usuarioActual.getNombreRol().trim().toUpperCase();
+    lblRol.setText(usuarioActual.getNombreRol());
+    lblUsuario.setText(usuarioActual.getNombre());
 
-    lblRol.setText(rol);
-    lblUsuario.setText(nombre);
-
-    // TODOS OCULTOS PRIMERO
+    // Ocultar todos primero
     btnDashboard.setVisible(false);
     btnUsuarios.setVisible(false);
     btnTorneos.setVisible(false);
     btnEquipos.setVisible(false);
     btnJugadores.setVisible(false);
     btnPartidos.setVisible(false);
+    btnArbitros.setVisible(false);
     btnEstadisticas.setVisible(false);
+    btnMiEquipo.setVisible(false);
+    btnAlineacion.setVisible(false);
+    btnResultados.setVisible(false);
 
-    switch (rol.toUpperCase()) {
-
+    switch (rol) {
         case "ADMIN":
-
-            btnDashboard.setVisible(true);
             btnUsuarios.setVisible(true);
-            btnTorneos.setVisible(true);
             btnEquipos.setVisible(true);
-            btnJugadores.setVisible(true);
-            btnPartidos.setVisible(true);
+            btnTorneos.setVisible(true);
+            btnArbitros.setVisible(true);
             btnEstadisticas.setVisible(true);
-
             break;
 
         case "COACH":
-
-            btnDashboard.setVisible(true);
-            btnEquipos.setVisible(true);
+            btnMiEquipo.setVisible(true);
             btnJugadores.setVisible(true);
             btnPartidos.setVisible(true);
-
+            btnAlineacion.setVisible(true);
             break;
 
         case "ARBITRO":
-
-            btnDashboard.setVisible(true);
-            btnPartidos.setVisible(true);
+            btnPartidos.setVisible(true);  // "Mis Partidos"
+            btnResultados.setVisible(true);
             btnEstadisticas.setVisible(true);
-
             break;
     }
 }
 
 private void abrirVentana(javax.swing.JInternalFrame ventana) {
-
-    desktopPane.removeAll();
-    desktopPane.repaint();
-
-    ventana.setVisible(true);
-
-    desktopPane.add(ventana);
-
-    try {
-        ventana.setSelected(true);
-    } catch (Exception e) {
-
+    // Verificar si ya está abierto
+    for (javax.swing.JInternalFrame frame : desktopPane.getAllFrames()) {
+        if (frame.getClass() == ventana.getClass()) {
+            try { frame.setSelected(true); } catch (Exception e) {}
+            return;
+        }
     }
+    // Tamaño cómodo, no maximizado
+    ventana.setSize(800, 500);
+    // Centrar dentro del desktopPane
+    int x = (desktopPane.getWidth() - 800) / 2;
+    int y = (desktopPane.getHeight() - 500) / 2;
+    ventana.setLocation(Math.max(0, x), Math.max(0, y));
+    ventana.setVisible(true);
+    desktopPane.add(ventana);
+    try { ventana.setSelected(true); } catch (Exception e) {}
 }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -135,62 +211,62 @@ private void abrirVentana(javax.swing.JInternalFrame ventana) {
         lblUsuario.setBorder(javax.swing.BorderFactory.createEtchedBorder(new java.awt.Color(255, 51, 0), new java.awt.Color(255, 51, 0)));
 
         btnDashboard.setBackground(new java.awt.Color(255, 102, 0));
-        btnDashboard.setForeground(new java.awt.Color(0, 0, 0));
+        btnDashboard.setForeground(new java.awt.Color(255, 255, 255));
         btnDashboard.setText("🏠 Dashboard");
         btnDashboard.addActionListener(this::btnDashboardActionPerformed);
 
         btnUsuarios.setBackground(new java.awt.Color(255, 102, 0));
-        btnUsuarios.setForeground(new java.awt.Color(0, 0, 0));
+        btnUsuarios.setForeground(new java.awt.Color(255, 255, 255));
         btnUsuarios.setText("👤 Usuarios");
         btnUsuarios.addActionListener(this::btnUsuariosActionPerformed);
 
         btnEquipos.setBackground(new java.awt.Color(255, 102, 0));
-        btnEquipos.setForeground(new java.awt.Color(0, 0, 0));
+        btnEquipos.setForeground(new java.awt.Color(255, 255, 255));
         btnEquipos.setText("👥 Equipos");
         btnEquipos.addActionListener(this::btnEquiposActionPerformed);
 
         btnJugadores.setBackground(new java.awt.Color(255, 102, 0));
-        btnJugadores.setForeground(new java.awt.Color(0, 0, 0));
+        btnJugadores.setForeground(new java.awt.Color(255, 255, 255));
         btnJugadores.setText("⛹ Jugadores");
         btnJugadores.addActionListener(this::btnJugadoresActionPerformed);
 
         btnTorneos.setBackground(new java.awt.Color(255, 102, 0));
-        btnTorneos.setForeground(new java.awt.Color(0, 0, 0));
+        btnTorneos.setForeground(new java.awt.Color(255, 255, 255));
         btnTorneos.setText("🏆 Torneos");
         btnTorneos.addActionListener(this::btnTorneosActionPerformed);
 
         btnPartidos.setBackground(new java.awt.Color(255, 102, 0));
-        btnPartidos.setForeground(new java.awt.Color(0, 0, 0));
+        btnPartidos.setForeground(new java.awt.Color(255, 255, 255));
         btnPartidos.setText("📅 Partidos");
         btnPartidos.addActionListener(this::btnPartidosActionPerformed);
 
         btnArbitros.setBackground(new java.awt.Color(255, 102, 0));
-        btnArbitros.setForeground(new java.awt.Color(0, 0, 0));
+        btnArbitros.setForeground(new java.awt.Color(255, 255, 255));
         btnArbitros.setText("⚠️ Árbitros");
         btnArbitros.addActionListener(this::btnArbitrosActionPerformed);
 
         btnEstadisticas.setBackground(new java.awt.Color(255, 102, 0));
-        btnEstadisticas.setForeground(new java.awt.Color(0, 0, 0));
+        btnEstadisticas.setForeground(new java.awt.Color(255, 255, 255));
         btnEstadisticas.setText("📊 Estadísticas");
         btnEstadisticas.addActionListener(this::btnEstadisticasActionPerformed);
 
         btnMiEquipo.setBackground(new java.awt.Color(255, 102, 0));
-        btnMiEquipo.setForeground(new java.awt.Color(0, 0, 0));
+        btnMiEquipo.setForeground(new java.awt.Color(255, 255, 255));
         btnMiEquipo.setText("⛹️‍ Mi Equipo");
         btnMiEquipo.addActionListener(this::btnMiEquipoActionPerformed);
 
         btnAlineacion.setBackground(new java.awt.Color(255, 102, 0));
-        btnAlineacion.setForeground(new java.awt.Color(0, 0, 0));
+        btnAlineacion.setForeground(new java.awt.Color(255, 255, 255));
         btnAlineacion.setText("📋 Alineación");
         btnAlineacion.addActionListener(this::btnAlineacionActionPerformed);
 
         btnResultados.setBackground(new java.awt.Color(255, 102, 0));
-        btnResultados.setForeground(new java.awt.Color(0, 0, 0));
+        btnResultados.setForeground(new java.awt.Color(255, 255, 255));
         btnResultados.setText("✅ Resultados");
         btnResultados.addActionListener(this::btnResultadosActionPerformed);
 
         btnCerrarSesion.setBackground(new java.awt.Color(255, 102, 0));
-        btnCerrarSesion.setForeground(new java.awt.Color(0, 0, 0));
+        btnCerrarSesion.setForeground(new java.awt.Color(255, 255, 255));
         btnCerrarSesion.setText("🚪 Cerrar Sesión");
         btnCerrarSesion.addActionListener(this::btnCerrarSesionActionPerformed);
 
@@ -213,7 +289,6 @@ private void abrirVentana(javax.swing.JInternalFrame ventana) {
                     .addComponent(btnArbitros, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnMiEquipo, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAlineacion, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnResultados, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanelMenuLayout.createSequentialGroup()
                             .addGap(10, 10, 10)
@@ -235,7 +310,9 @@ private void abrirVentana(javax.swing.JInternalFrame ventana) {
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMenuLayout.createSequentialGroup()
                             .addContainerGap()
                             .addComponent(btnEstadisticas, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(btnCerrarSesion))
+                    .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(btnCerrarSesion, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnResultados, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)))
                 .addContainerGap(12, Short.MAX_VALUE))
         );
         jPanelMenuLayout.setVerticalGroup(
@@ -285,23 +362,21 @@ private void abrirVentana(javax.swing.JInternalFrame ventana) {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(desktopPane, javax.swing.GroupLayout.DEFAULT_SIZE, 864, Short.MAX_VALUE)
+            .addComponent(desktopPane, javax.swing.GroupLayout.DEFAULT_SIZE, 778, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(desktopPane, javax.swing.GroupLayout.PREFERRED_SIZE, 589, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(desktopPane, javax.swing.GroupLayout.PREFERRED_SIZE, 586, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnDashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDashboardActionPerformed
-
-    IFDashboard dashboard = new IFDashboard();
-
-    abrirVentana(dashboard);
+        // Solo cerrar todos los InternalFrames abiertos
+    for (javax.swing.JInternalFrame frame : desktopPane.getAllFrames()) {
+        frame.dispose();
+    }
     }//GEN-LAST:event_btnDashboardActionPerformed
 
     private void btnUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsuariosActionPerformed

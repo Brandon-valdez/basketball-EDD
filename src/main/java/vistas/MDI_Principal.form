@@ -23,15 +23,12 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="desktopPane" alignment="0" pref="864" max="32767" attributes="0"/>
+          <Component id="desktopPane" alignment="0" pref="778" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Component id="desktopPane" min="-2" pref="589" max="-2" attributes="0"/>
-              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-          </Group>
+          <Component id="desktopPane" min="-2" pref="586" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -75,7 +72,6 @@
                           <Component id="btnArbitros" alignment="1" min="-2" pref="116" max="-2" attributes="0"/>
                           <Component id="btnMiEquipo" alignment="1" min="-2" pref="116" max="-2" attributes="0"/>
                           <Component id="btnAlineacion" alignment="1" min="-2" pref="116" max="-2" attributes="0"/>
-                          <Component id="btnResultados" alignment="1" min="-2" pref="116" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
@@ -107,7 +103,10 @@
                                   <Component id="btnEstadisticas" min="-2" pref="116" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <Component id="btnCerrarSesion" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="1" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="btnCerrarSesion" alignment="1" max="32767" attributes="0"/>
+                              <Component id="btnResultados" alignment="1" pref="116" max="32767" attributes="0"/>
+                          </Group>
                       </Group>
                       <EmptySpace pref="12" max="32767" attributes="0"/>
                   </Group>
@@ -214,7 +213,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="\ud83c\udfe0 Dashboard" containsInvalidXMLChars="true"/>
               </Properties>
@@ -228,7 +227,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="\ud83d\udc64 Usuarios" containsInvalidXMLChars="true"/>
               </Properties>
@@ -242,7 +241,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="\ud83d\udc65 Equipos" containsInvalidXMLChars="true"/>
               </Properties>
@@ -256,7 +255,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="&#x26f9; Jugadores"/>
               </Properties>
@@ -270,7 +269,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="\ud83c\udfc6 Torneos" containsInvalidXMLChars="true"/>
               </Properties>
@@ -284,7 +283,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="\ud83d\udcc5 Partidos" containsInvalidXMLChars="true"/>
               </Properties>
@@ -298,7 +297,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="&#x26a0;&#xfe0f; &#xc1;rbitros"/>
               </Properties>
@@ -312,7 +311,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="\ud83d\udcca Estad&#xed;sticas" containsInvalidXMLChars="true"/>
               </Properties>
@@ -326,7 +325,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="&#x26f9;&#xfe0f;&#x200d; Mi Equipo"/>
               </Properties>
@@ -340,7 +339,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="\ud83d\udccb Alineaci&#xf3;n" containsInvalidXMLChars="true"/>
               </Properties>
@@ -354,7 +353,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="&#x2705; Resultados"/>
               </Properties>
@@ -368,7 +367,7 @@
                   <Color blue="0" green="66" red="ff" type="rgb"/>
                 </Property>
                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="0" green="0" red="0" type="rgb"/>
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="\ud83d\udeaa Cerrar Sesi&#xf3;n" containsInvalidXMLChars="true"/>
               </Properties>
