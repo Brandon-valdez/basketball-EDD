@@ -1,14 +1,14 @@
 package vistas;
 import util.Sesion;
 
-public class MDI extends javax.swing.JFrame {
+public class MDI_Principal extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MDI.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MDI_Principal.class.getName());
 
     /**
      * Creates new form mdi
      */
-    public MDI() {
+    public MDI_Principal() {
         initComponents();
         setLocationRelativeTo(null);
     setExtendedState(MAXIMIZED_BOTH);
@@ -368,7 +368,7 @@ private void abrirVentana(javax.swing.JInternalFrame ventana) {
     private void btnCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSesionActionPerformed
          dispose();
 
-    Login login = new Login();
+    Login_BKB login = new Login_BKB();
 
     login.setVisible(true);
     }//GEN-LAST:event_btnCerrarSesionActionPerformed
@@ -395,7 +395,7 @@ private void abrirVentana(javax.swing.JInternalFrame ventana) {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new MDI().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new MDI_Principal().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

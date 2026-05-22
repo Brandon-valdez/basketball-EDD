@@ -12,14 +12,14 @@ import javax.swing.JOptionPane;
  *
  * @author admin
  */
-public class login extends javax.swing.JFrame {
+public class Login_BKB extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(login.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Login_BKB.class.getName());
 
     /**
      * Creates new form login
      */
-    public login() {
+    public Login_BKB() {
         initComponents();
         ImageIcon icon = new ImageIcon(getClass().getResource("/imagenes/Basketball.png"));
         Image img = icon.getImage();
@@ -114,25 +114,37 @@ public class login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
-        // TODO add your handling code here:
-         String usuario = txtUser.getText();
-        String password = new String(txtPass.getPassword());
+        String email = txtUser.getText();
+    String password = new String(txtPass.getPassword());
 
-        // Validación simple
-        if(usuario.equals("admin") && password.equals("1234")) {
+    try {
 
-            // Abrir MDI
-            mdi MDI = new mdi();
-            MDI.setVisible(true);
+        servicio.AuthService authService = new servicio.AuthService();
 
-            // Cerrar login
+        modelo.Usuario usuario = authService.login(email, password);
+
+        if (usuario != null) {
+
+            // ABRIR MDI
+            MDI_Principal ventana = new MDI_Principal();
+
+            ventana.setVisible(true);
+
             dispose();
 
         } else {
-            JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos");
-        }
-    
 
+            JOptionPane.showMessageDialog(this,
+                    "Correo o contraseña incorrectos");
+
+        }
+
+    } catch (Exception e) {
+
+        JOptionPane.showMessageDialog(this,
+                "Error: " + e.getMessage());
+
+    }
     }//GEN-LAST:event_btnIngresarActionPerformed
 
     /**
@@ -157,7 +169,7 @@ public class login extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new login().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new Login_BKB().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
