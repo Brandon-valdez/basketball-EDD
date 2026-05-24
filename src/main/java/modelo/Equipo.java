@@ -5,27 +5,39 @@ public class Equipo {
     private String nombre;
     private String ciudad;
     private int    idUsuario;
+    private String logo;
+    private String fechaCreacion;
+    private int estado;
     private String nombreDirector; // extra para vistas
 
-    public Equipo() {}
 
-    public Equipo(int idEquipo, String nombre, String ciudad, int idUsuario) {
-        this.idEquipo  = idEquipo;
-        this.nombre    = nombre;
-        this.ciudad    = ciudad;
+    public Equipo(int idEquipo, String nombre, String ciudad, int idUsuario, String logo, String fechaCreacion, int estado, String nombreDirector) {
+        this.idEquipo = idEquipo;
+        this.nombre = nombre;
+        this.ciudad = ciudad;
         this.idUsuario = idUsuario;
+        this.logo = logo;
+        this.fechaCreacion = fechaCreacion;
+        this.estado = estado;
+        this.nombreDirector = nombreDirector;
     }
 
     public int    getIdEquipo()        { return idEquipo; }
     public String getNombre()          { return nombre; }
     public String getCiudad()          { return ciudad; }
     public int    getIdUsuario()       { return idUsuario; }
+    public String getLogo()            { return logo; }
+    public String getFechaCreacion()   { return fechaCreacion; }
+    public int    getEstado()          { return estado; }
     public String getNombreDirector()  { return nombreDirector; }
 
     public void setIdEquipo(int id)               { this.idEquipo        = id; }
     public void setNombre(String nombre)          { this.nombre          = nombre; }
     public void setCiudad(String ciudad)          { this.ciudad          = ciudad; }
     public void setIdUsuario(int idUsuario)       { this.idUsuario       = idUsuario; }
+    public void setLogo(String logo)              { this.logo            = logo; }
+    public void setFechaCreacion(String fecha)    { this.fechaCreacion   = fecha; }
+    public void setEstado(int estado)             { this.estado          = estado; }
     public void setNombreDirector(String nombre)  { this.nombreDirector  = nombre; }
 
     @Override

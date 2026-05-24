@@ -4,17 +4,128 @@
  */
 package vistas;
 
+import dao.EquipoDAO;
+import modelo.Equipo;
+import modelo.Usuario;
+import util.Sesion;
+import java.awt.Image;
+import java.io.File;
+import java.sql.SQLException;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.JDesktopPane;
+
 /**
  *
  * @author 1
  */
 public class IFMiEquipo extends javax.swing.JInternalFrame {
 
+    private Equipo equipoActual;
+
     /**
      * Creates new form IFMiEquipo
      */
     public IFMiEquipo() {
         initComponents();
+        cargarDatosEquipo();
+    }
+
+    public void recargar() {
+        cargarDatosEquipo();
+    }
+
+    private void cargarDatosEquipo() {
+        if (!Sesion.getInstancia().estaLogueado()) {
+            mostrarSinEquipo("No hay sesión iniciada");
+            btnCrear.setVisible(true);
+            btnEditar.setVisible(false);
+            btnEliminar.setVisible(false);
+            return;
+        }
+
+        Usuario usuario = Sesion.getInstancia().getUsuario();
+        if (usuario == null) {
+            mostrarSinEquipo("No hay usuario activo");
+            btnCrear.setVisible(true);
+            btnEditar.setVisible(false);
+            btnEliminar.setVisible(false);
+            return;
+        }
+
+        try {
+            Equipo equipo = new EquipoDAO().buscarPorUsuario(usuario.getIdUsuario());
+            if (equipo == null) {
+                mostrarSinEquipo("No tienes un equipo registrado");
+                btnCrear.setVisible(true);
+                btnEditar.setVisible(false);
+                btnEliminar.setVisible(false);
+                return;
+            }
+
+            lblNombre.setText(valorVisible(equipo.getNombre()));
+            lblCiudad.setText(valorVisible(equipo.getCiudad()));
+            lblCreacion.setText(valorVisible(equipo.getFechaCreacion()));
+            mostrarLogo(equipo.getLogo());
+            this.equipoActual = equipo;
+
+            btnCrear.setVisible(false);
+            btnEditar.setVisible(true);
+            btnEliminar.setVisible(true);
+        } catch (SQLException ex) {
+            mostrarSinEquipo("Error al cargar el equipo");
+            btnCrear.setVisible(true);
+            btnEditar.setVisible(false);
+            btnEliminar.setVisible(false);
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo cargar la información del equipo:\n" + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void mostrarSinEquipo(String mensaje) {
+        lblNombre.setText(mensaje);
+        lblCiudad.setText("-");
+        lblCreacion.setText("-");
+        jLabel1.setIcon(null);
+        jLabel1.setText("Sin logo");
+    }
+
+    private String valorVisible(String valor) {
+        return (valor == null || valor.isBlank()) ? "-" : valor;
+    }
+
+    private void mostrarLogo(String logo) {
+        jLabel1.setText("");
+        jLabel1.setIcon(null);
+
+        if (logo == null || logo.isBlank()) {
+            jLabel1.setText("Sin logo");
+            return;
+        }
+
+        ImageIcon icono = null;
+
+        File archivo = new File(logo);
+        if (archivo.exists()) {
+            icono = new ImageIcon(logo);
+        } else {
+            java.net.URL recurso = getClass().getClassLoader().getResource(logo);
+            if (recurso != null) {
+                icono = new ImageIcon(recurso);
+            }
+        }
+
+        if (icono == null || icono.getIconWidth() <= 0) {
+            jLabel1.setText("Sin logo");
+            return;
+        }
+
+        Image imagen = icono.getImage().getScaledInstance(jLabel1.getWidth() > 0 ? jLabel1.getWidth() : 159,
+                jLabel1.getHeight() > 0 ? jLabel1.getHeight() : 172,
+                Image.SCALE_SMOOTH);
+        jLabel1.setIcon(new ImageIcon(imagen));
     }
 
     /**
@@ -26,26 +137,250 @@ public class IFMiEquipo extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        lblNombre = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        lblCiudad = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        lblCreacion = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        btnCrear = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+
+        setBackground(new java.awt.Color(0, 0, 0));
         setBorder(null);
         setClosable(true);
+        setForeground(java.awt.Color.black);
+        setIconifiable(true);
+        setMaximizable(true);
         setResizable(true);
         setAutoscrolls(true);
+
+        jPanel1.setBackground(new java.awt.Color(0, 0, 0));
+        jPanel1.setForeground(new java.awt.Color(255, 255, 255));
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("Nombre");
+
+        lblNombre.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lblNombre.setForeground(new java.awt.Color(255, 255, 255));
+        lblNombre.setText(".");
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Ciudad");
+
+        lblCiudad.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lblCiudad.setForeground(new java.awt.Color(255, 255, 255));
+        lblCiudad.setText(".");
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setText("Fecha de creación");
+
+        lblCreacion.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lblCreacion.setForeground(new java.awt.Color(255, 255, 255));
+        lblCreacion.setText(".");
+
+        jPanel2.setBackground(new java.awt.Color(0, 0, 0));
+
+        btnCrear.setBackground(new java.awt.Color(255, 102, 0));
+        btnCrear.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnCrear.setForeground(new java.awt.Color(255, 255, 255));
+        btnCrear.setText("Crear Equipo");
+        btnCrear.addActionListener(this::btnCrearActionPerformed);
+
+        btnEliminar.setBackground(new java.awt.Color(255, 102, 0));
+        btnEliminar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(this::btnEliminarActionPerformed);
+
+        btnEditar.setBackground(new java.awt.Color(255, 102, 0));
+        btnEditar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnEditar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEditar.setText("Modificar");
+        btnEditar.addActionListener(this::btnEditarActionPerformed);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(45, 45, 45)
+                .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(158, 158, 158)
+                .addComponent(btnCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(79, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnEditar, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+                    .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(38, Short.MAX_VALUE))
+        );
+
+        jLabel5.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 51, 0));
+        jLabel5.setText("Mi Equipo");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap(149, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(78, 78, 78)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(lblNombre)
+                                    .addComponent(jLabel3)
+                                    .addComponent(lblCiudad)
+                                    .addComponent(jLabel4)
+                                    .addComponent(lblCreacion)))
+                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(172, 172, 172))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(266, 266, 266))))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblNombre)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblCiudad)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblCreacion))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(61, 61, 61))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 406, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 286, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnCrearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearActionPerformed
+        IFCrearEquipo crearEquipo = new IFCrearEquipo(this);
+        JDesktopPane desktop = this.getDesktopPane();
+        desktop.add(crearEquipo);
+        crearEquipo.setVisible(true);
+    }//GEN-LAST:event_btnCrearActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {
+        if (equipoActual == null) {
+            JOptionPane.showMessageDialog(this,
+                    "No hay equipo para editar.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        IFCrearEquipo editarEquipo = new IFCrearEquipo(this, equipoActual);
+        JDesktopPane desktop = this.getDesktopPane();
+        desktop.add(editarEquipo);
+        editarEquipo.setVisible(true);
+    }
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {
+        if (equipoActual == null) {
+            JOptionPane.showMessageDialog(this,
+                    "No hay equipo para eliminar.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int confirmacion = JOptionPane.showConfirmDialog(this,
+                "¿Estás seguro de que deseas eliminar el equipo '" + equipoActual.getNombre() + "'?",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirmacion != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+            EquipoDAO dao = new EquipoDAO();
+            if (dao.desactivar(equipoActual.getIdEquipo())) {
+                JOptionPane.showMessageDialog(this,
+                        "Equipo eliminado correctamente.",
+                        "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+                equipoActual = null;
+                recargar();
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "No se pudo eliminar el equipo.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error al eliminar el equipo:\n" + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCrear;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel lblCiudad;
+    private javax.swing.JLabel lblCreacion;
+    private javax.swing.JLabel lblNombre;
     // End of variables declaration//GEN-END:variables
 }
