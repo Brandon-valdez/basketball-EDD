@@ -13,58 +13,111 @@ public class AlineacionDAO {
         return Conexion.getInstancia().getConexion();
     }
 
-    /** Alineación de un equipo en un partido (titulares y suplentes) */
-    public List<Alineacion> listar(int idPartido, int idEquipo) throws SQLException {
-        List<Alineacion> lista = new ArrayList<>();
-        String sql = """
-                SELECT al.*, CONCAT(j.nombre,' ',j.apellido) AS nombre_jugador,
-                       j.posicion, j.numero_camiseta
-                FROM ALINEACION al JOIN JUGADORES j ON j.id_jugador = al.id_jugador
-                WHERE al.id_partido=? AND al.id_equipo=?
-                ORDER BY al.titular DESC, j.numero_camiseta
-                """;
+    public boolean insertar(Alineacion alineacion) throws SQLException {
+        String sql = "INSERT INTO ALINEACION (id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id) VALUES (?,?,?,?,?,?,?)";
+        try (PreparedStatement ps = getConn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, alineacion.getIdPartido());
+            ps.setInt(2, alineacion.getIdEquipo());
+            ps.setInt(3, alineacion.getBaseId());
+            ps.setInt(4, alineacion.getEscoltaId());
+            ps.setInt(5, alineacion.getAleroId());
+            ps.setInt(6, alineacion.getAlaPivotId());
+            ps.setInt(7, alineacion.getPivotId());
+            if (ps.executeUpdate() > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        alineacion.setIdAlineacion(rs.getInt(1));
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public boolean actualizar(Alineacion alineacion) throws SQLException {
+        String sql = "UPDATE ALINEACION SET id_partido=?, id_equipo=?, base_id=?, escolta_id=?, alero_id=?, ala_pivot_id=?, pivot_id=? WHERE id_alineacion=?";
+        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+            ps.setInt(1, alineacion.getIdPartido());
+            ps.setInt(2, alineacion.getIdEquipo());
+            ps.setInt(3, alineacion.getBaseId());
+            ps.setInt(4, alineacion.getEscoltaId());
+            ps.setInt(5, alineacion.getAleroId());
+            ps.setInt(6, alineacion.getAlaPivotId());
+            ps.setInt(7, alineacion.getPivotId());
+            ps.setInt(8, alineacion.getIdAlineacion());
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public boolean eliminar(int idAlineacion) throws SQLException {
+        String sql = "DELETE FROM ALINEACION WHERE id_alineacion=?";
+        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+            ps.setInt(1, idAlineacion);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public Alineacion buscarPorId(int idAlineacion) throws SQLException {
+        String sql = "SELECT id_alineacion, id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id FROM ALINEACION WHERE id_alineacion=?";
+        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+            ps.setInt(1, idAlineacion);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapear(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public Alineacion buscarPorPartidoYEquipo(int idPartido, int idEquipo) throws SQLException {
+        String sql = "SELECT id_alineacion, id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id FROM ALINEACION WHERE id_partido=? AND id_equipo=?";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setInt(1, idPartido);
             ps.setInt(2, idEquipo);
             try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapear(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Alineacion> listarPorPartido(int idPartido) throws SQLException {
+        List<Alineacion> lista = new ArrayList<>();
+        String sql = "SELECT id_alineacion, id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id FROM ALINEACION WHERE id_partido=? ORDER BY id_equipo";
+        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+            ps.setInt(1, idPartido);
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Alineacion a = new Alineacion();
-                    a.setIdAlineacion(rs.getInt("id_alineacion"));
-                    a.setIdPartido(rs.getInt("id_partido"));
-                    a.setIdEquipo(rs.getInt("id_equipo"));
-                    a.setIdJugador(rs.getInt("id_jugador"));
-                    a.setTitular(rs.getBoolean("titular"));
-                    a.setNombreJugador(rs.getString("nombre_jugador"));
-                    a.setPosicion(rs.getString("posicion"));
-                    a.setNumeroCamiseta(rs.getInt("numero_camiseta"));
-                    lista.add(a);
+                    lista.add(mapear(rs));
                 }
             }
         }
         return lista;
     }
 
-    /** Guarda la alineación completa de un equipo para un partido (borra y re-inserta) */
-    public boolean guardarAlineacion(int idPartido, int idEquipo, List<Alineacion> jugadores) throws SQLException {
-        // Borrar alineación previa de ese equipo en ese partido
-        String del = "DELETE FROM ALINEACION WHERE id_partido=? AND id_equipo=?";
-        try (PreparedStatement ps = getConn().prepareStatement(del)) {
-            ps.setInt(1, idPartido);
-            ps.setInt(2, idEquipo);
-            ps.executeUpdate();
+    public boolean guardar(Alineacion alineacion) throws SQLException {
+        Alineacion existente = buscarPorPartidoYEquipo(alineacion.getIdPartido(), alineacion.getIdEquipo());
+        if (existente == null) {
+            return insertar(alineacion);
         }
-        // Re-insertar
-        String ins = "INSERT INTO ALINEACION (id_partido, id_equipo, id_jugador, titular) VALUES (?,?,?,?)";
-        try (PreparedStatement ps = getConn().prepareStatement(ins)) {
-            for (Alineacion a : jugadores) {
-                ps.setInt(1, idPartido);
-                ps.setInt(2, idEquipo);
-                ps.setInt(3, a.getIdJugador());
-                ps.setBoolean(4, a.isTitular());
-                ps.addBatch();
-            }
-            int[] resultados = ps.executeBatch();
-            return resultados.length == jugadores.size();
-        }
+        alineacion.setIdAlineacion(existente.getIdAlineacion());
+        return actualizar(alineacion);
+    }
+
+    private Alineacion mapear(ResultSet rs) throws SQLException {
+        return new Alineacion(
+                rs.getInt("id_alineacion"),
+                rs.getInt("id_partido"),
+                rs.getInt("id_equipo"),
+                rs.getInt("base_id"),
+                rs.getInt("escolta_id"),
+                rs.getInt("alero_id"),
+                rs.getInt("ala_pivot_id"),
+                rs.getInt("pivot_id")
+        );
     }
 }
