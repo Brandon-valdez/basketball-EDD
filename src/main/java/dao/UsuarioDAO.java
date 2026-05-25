@@ -22,7 +22,7 @@ public class UsuarioDAO {
                 SELECT u.id_usuario, u.nombre, u.email, u.id_rol, r.nombre_rol
                 FROM USUARIOS u
                 JOIN ROL r ON r.id_rol = u.id_rol
-                WHERE u.email = ? AND u.contrasena = MD5(?)
+                WHERE u.email = ? AND u.contrasena = SHA2(?, 256)
                 """;
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setString(1, email);
@@ -67,7 +67,7 @@ public class UsuarioDAO {
 
     /** Inserta un nuevo usuario (contraseña guardada como MD5) */
     public boolean insertar(Usuario u) throws SQLException {
-        String sql = "INSERT INTO USUARIOS (nombre, email, contrasena, id_rol) VALUES (?, ?, MD5(?), ?)";
+        String sql = "INSERT INTO USUARIOS (nombre, email, contrasena, id_rol) VALUES (?, ?, SHA2(?, 256), ?)";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setString(1, u.getNombre());
             ps.setString(2, u.getEmail());
@@ -91,7 +91,7 @@ public class UsuarioDAO {
 
     /** Cambia la contraseña de un usuario */
     public boolean cambiarContrasena(int idUsuario, String nuevaContrasena) throws SQLException {
-        String sql = "UPDATE USUARIOS SET contrasena=MD5(?) WHERE id_usuario=?";
+        String sql = "UPDATE USUARIOS SET contrasena=SHA2(?, 256) WHERE id_usuario=?";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setString(1, nuevaContrasena);
             ps.setInt(2, idUsuario);

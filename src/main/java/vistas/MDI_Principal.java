@@ -94,7 +94,7 @@ lblRol.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 private void configurarRol() {
 
     modelo.Usuario usuarioActual = util.Sesion.getInstancia().getUsuario();
-     // DEBUG - borralo después
+     // DEBUG
     System.out.println("Usuario: " + (usuarioActual != null ? usuarioActual.getNombre() : "NULL"));
     System.out.println("Rol: " + (usuarioActual != null ? usuarioActual.getNombreRol() : "NULL"));
     if (usuarioActual == null) return;
