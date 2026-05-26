@@ -187,11 +187,23 @@ public class IFTorneos extends javax.swing.JInternalFrame {
 
     private void generarPartidos() {
         if (idSeleccionado == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccioná un torneo primero.");
-            return;
-        }
-        // Por ahora placeholder — acá va el algoritmo round-robin después
-        JOptionPane.showMessageDialog(this, "Generación de partidos próximamente.");
+        JOptionPane.showMessageDialog(this, "Seleccioná un torneo primero.");
+        return;
+    }
+    try {
+        servicio.PartidoService service = new servicio.PartidoService();
+        int generados = service.generarFixture(
+            idSeleccionado,
+            java.time.LocalDateTime.now(),
+            "Por definir",
+            7
+        );
+        JOptionPane.showMessageDialog(this, "Se generaron " + generados + " partidos correctamente.");
+    } catch (IllegalStateException ex) {
+        JOptionPane.showMessageDialog(this, ex.getMessage());
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+    }
     }
 
     private void limpiar() {
