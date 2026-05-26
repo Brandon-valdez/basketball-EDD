@@ -1,6 +1,6 @@
 package servicio;
 
-import dao.ArbitroDAO;
+import dao.arbitroDAO;
 import dao.EquipoDAO;
 import dao.PartidoDAO;
 import modelo.Arbitro;
@@ -30,7 +30,7 @@ import java.util.List;
 public class PartidoService {
 
     private final EquipoDAO  equipoDAO  = new EquipoDAO();
-    private final ArbitroDAO arbitroDAO = new ArbitroDAO();
+    private final arbitroDAO arbitroDAO = new arbitroDAO();
     private final PartidoDAO partidoDAO = new PartidoDAO();
 
     /**
