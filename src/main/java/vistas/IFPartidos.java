@@ -31,6 +31,23 @@ private void configurarTabla() {
         public boolean isCellEditable(int row, int col) { return false; }
     };
     tblPartidos.setModel(modeloTabla);
+    
+    // Configurar renderer personalizado para las celdas
+    javax.swing.table.DefaultTableCellRenderer renderer = new javax.swing.table.DefaultTableCellRenderer();
+    renderer.setBackground(new java.awt.Color(51, 51, 51));
+    renderer.setForeground(new java.awt.Color(0, 0, 0));
+    
+    for (int i = 0; i < tblPartidos.getColumnCount(); i++) {
+        tblPartidos.getColumnModel().getColumn(i).setCellRenderer(renderer);
+    }
+    
+    tblPartidos.setBackground(new java.awt.Color(51, 51, 51));
+    tblPartidos.setForeground(new java.awt.Color(0, 0, 0));
+    tblPartidos.setGridColor(new java.awt.Color(80, 80, 80));
+    tblPartidos.setSelectionBackground(new java.awt.Color(80, 80, 80));
+    tblPartidos.setSelectionForeground(new java.awt.Color(0, 0, 0));
+    tblPartidos.getTableHeader().setBackground(new java.awt.Color(51, 51, 51));
+    tblPartidos.getTableHeader().setForeground(new java.awt.Color(0, 0, 0));
     // ocultar columna ID
     tblPartidos.getColumnModel().getColumn(0).setMinWidth(0);
     tblPartidos.getColumnModel().getColumn(0).setMaxWidth(0);
@@ -65,12 +82,15 @@ private void cargarPartidos() {
     }
 }
 
+
     public IFPartidos() {   
     initComponents();
     configurarTabla();
     cargarPartidos();
+    
 }
 
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -100,12 +120,14 @@ private void cargarPartidos() {
         jLabel1.setText("Mis partidos asignados");
         jLabel1.setOpaque(true);
 
-        btnRefrescar.setBackground(new java.awt.Color(255, 153, 51));
+        btnRefrescar.setBackground(new java.awt.Color(255, 102, 0));
         btnRefrescar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         btnRefrescar.setForeground(new java.awt.Color(255, 255, 255));
         btnRefrescar.setText("Refrescar");
         btnRefrescar.addActionListener(this::btnRefrescarActionPerformed);
 
+        tblPartidos.setBackground(new java.awt.Color(0, 0, 0));
+        tblPartidos.setForeground(new java.awt.Color(255, 255, 255));
         tblPartidos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},

@@ -417,7 +417,7 @@ private void abrirVentana(javax.swing.JInternalFrame ventana) {
     }//GEN-LAST:event_btnArbitrosActionPerformed
 
     private void btnEstadisticasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEstadisticasActionPerformed
-        IFEstadisticas estadisticas = new IFEstadisticas();
+        IFINFORMES estadisticas = new IFINFORMES();
 
     abrirVentana(estadisticas);
     }//GEN-LAST:event_btnEstadisticasActionPerformed

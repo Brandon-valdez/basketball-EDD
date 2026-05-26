@@ -4,7 +4,7 @@
  */
 package vistas;
 
-import dao.arbitroDAO;
+import dao.ArbitroDAO;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -20,7 +20,7 @@ public class IFArbitros extends javax.swing.JInternalFrame {
      * Creates new form IFArbitros
      */
     
-    private final arbitroDAO arbitroDAO = new arbitroDAO();
+    private final ArbitroDAO arbitroDAO = new ArbitroDAO();
     private int idSeleccionado = -1;
     public IFArbitros() {
         initComponents();

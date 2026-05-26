@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class arbitroDAO {
+public class ArbitroDAO {
 
     private Connection getConn() throws SQLException {
         return Conexion.getInstancia().getConexion();

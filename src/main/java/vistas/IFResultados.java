@@ -3,20 +3,78 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
  */
 package vistas;
-
+import dao.PartidoDAO;
+import dao.ResultadoDAO;
+import modelo.Partido;
+import modelo.Resultado;
+import util.Sesion;
+import javax.swing.*;
+import java.sql.SQLException;
+import java.util.List;
 /**
  *
  * @author 1
  */
 public class IFResultados extends javax.swing.JInternalFrame {
-
+private final PartidoDAO partidoDAO = new PartidoDAO();
+private final ResultadoDAO resultadoDAO = new ResultadoDAO();
+private List<Partido> partidos;
     /**
      * Creates new form IFResultados
      */
+
+
+private void cargarPartidos() {
+    try {
+        int idArbitro = Sesion.getInstancia().getUsuario().getIdUsuario();
+        partidos = partidoDAO.listarPorArbitro(idArbitro);
+        cmbPartidos.removeAllItems();
+        for (Partido p : partidos) {
+            cmbPartidos.addItem(p.getNombreEquipoLocal() + " vs " + p.getNombreEquipoVisit()
+                    + " — " + p.getFecha().toLocalDate());
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this,
+                "Error al cargar partidos: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
+private void guardarResultado() {
+    int idx = cmbPartidos.getSelectedIndex();
+    if (idx < 0) {
+        JOptionPane.showMessageDialog(this, "Selecciona un partido.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    try {
+        int pLocal = Integer.parseInt(txtLocal1.getText().trim());
+        int pVisit = Integer.parseInt(txtVisit.getText().trim());
+
+        Partido p = partidos.get(idx);
+        Resultado r = new Resultado();
+        r.setIdPartido(p.getIdPartido());
+        r.setPuntosLocal(pLocal);
+        r.setPuntosVisit(pVisit);
+        r.setEstado("finalizado");
+
+       resultadoDAO.finalizarPartido(p.getIdPartido(), pLocal, pVisit);
+        JOptionPane.showMessageDialog(this, "Resultado guardado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        cargarPartidos();
+        txtLocal1.setText("");
+        txtVisit.setText("");
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Los puntos deben ser números.", "Error", JOptionPane.ERROR_MESSAGE);
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error al guardar: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
     public IFResultados() {
         initComponents();
+         cargarPartidos();
     }
 
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -26,26 +84,155 @@ public class IFResultados extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        vs = new javax.swing.JLabel();
+        cmbPartidos = new javax.swing.JComboBox<>();
+        lblPartido = new javax.swing.JLabel();
+        txtVisit = new javax.swing.JTextField();
+        lblVisit = new javax.swing.JLabel();
+        lblLocal1 = new javax.swing.JLabel();
+        txtLocal1 = new javax.swing.JTextField();
+        btnGuardar = new javax.swing.JButton();
+
         setBorder(null);
         setClosable(true);
         setResizable(true);
         setAutoscrolls(true);
 
+        jPanel1.setBackground(new java.awt.Color(0, 0, 0));
+
+        vs.setBackground(new java.awt.Color(0, 0, 0));
+        vs.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        vs.setForeground(new java.awt.Color(255, 255, 255));
+        vs.setText("VS");
+        vs.setOpaque(true);
+
+        cmbPartidos.setBackground(new java.awt.Color(102, 102, 102));
+        cmbPartidos.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        cmbPartidos.setForeground(new java.awt.Color(255, 255, 255));
+
+        lblPartido.setBackground(new java.awt.Color(0, 0, 0));
+        lblPartido.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        lblPartido.setForeground(new java.awt.Color(255, 255, 255));
+        lblPartido.setText("Partido:");
+        lblPartido.setOpaque(true);
+
+        txtVisit.setBackground(new java.awt.Color(102, 102, 102));
+        txtVisit.setForeground(new java.awt.Color(255, 255, 255));
+
+        lblVisit.setBackground(new java.awt.Color(0, 0, 0));
+        lblVisit.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblVisit.setForeground(new java.awt.Color(255, 255, 255));
+        lblVisit.setText("Visitante:");
+        lblVisit.setOpaque(true);
+
+        lblLocal1.setBackground(new java.awt.Color(0, 0, 0));
+        lblLocal1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblLocal1.setForeground(new java.awt.Color(255, 255, 255));
+        lblLocal1.setText("Local:");
+        lblLocal1.setOpaque(true);
+
+        txtLocal1.setBackground(new java.awt.Color(102, 102, 102));
+        txtLocal1.setForeground(new java.awt.Color(255, 255, 255));
+        txtLocal1.addActionListener(this::txtLocal1ActionPerformed);
+
+        btnGuardar.setBackground(new java.awt.Color(255, 102, 0));
+        btnGuardar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
+        btnGuardar.setText("GUARDAR RESULTADO");
+        btnGuardar.addActionListener(this::btnGuardarActionPerformed);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(260, 260, 260))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(318, 318, 318)
+                .addComponent(cmbPartidos, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(71, 71, 71))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(57, 57, 57)
+                .addComponent(lblLocal1)
+                .addGap(18, 18, 18)
+                .addComponent(txtLocal1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(68, 68, 68)
+                .addComponent(vs)
+                .addGap(34, 34, 34)
+                .addComponent(lblVisit)
+                .addGap(26, 26, 26)
+                .addComponent(txtVisit, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+                .addGap(22, 22, 22))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblPartido)
+                .addGap(282, 282, 282))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(72, 72, 72)
+                .addComponent(lblPartido, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(cmbPartidos, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(50, 50, 50)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtLocal1, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblLocal1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 86, Short.MAX_VALUE)
+                        .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(34, 34, 34))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(vs, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblVisit, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtVisit, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 406, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 286, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void txtLocal1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLocal1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtLocal1ActionPerformed
+
+    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+        // TODO add your handling code here:
+        guardarResultado();
+    }//GEN-LAST:event_btnGuardarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnGuardar;
+    private javax.swing.JComboBox<String> cmbPartidos;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel lblLocal1;
+    private javax.swing.JLabel lblPartido;
+    private javax.swing.JLabel lblVisit;
+    private javax.swing.JTextField txtLocal1;
+    private javax.swing.JTextField txtVisit;
+    private javax.swing.JLabel vs;
     // End of variables declaration//GEN-END:variables
 }
