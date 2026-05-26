@@ -3,19 +3,73 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
  */
 package vistas;
+import dao.PartidoDAO;
+import modelo.Partido;
+import util.Sesion;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  *
  * @author 1
  */
-public class IFPartidos extends javax.swing.JInternalFrame {
-
+public class IFPartidos extends javax.swing.JInternalFrame  {
+private final PartidoDAO partidoDAO = new PartidoDAO();
+private DefaultTableModel modeloTabla;
     /**
      * Creates new form IFPartidos
      */
-    public IFPartidos() {
-        initComponents();
+
+private void configurarTabla() {
+    modeloTabla = new DefaultTableModel(
+        new String[]{"ID", "Fecha", "Local", "Visitante", "Torneo", "Lugar", "Estado", "Marcador"},
+        0
+    ) {
+        @Override
+        public boolean isCellEditable(int row, int col) { return false; }
+    };
+    tblPartidos.setModel(modeloTabla);
+    // ocultar columna ID
+    tblPartidos.getColumnModel().getColumn(0).setMinWidth(0);
+    tblPartidos.getColumnModel().getColumn(0).setMaxWidth(0);
+    tblPartidos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    tblPartidos.getTableHeader().setReorderingAllowed(false);
+}
+
+private void cargarPartidos() {
+    modeloTabla.setRowCount(0);
+    try {
+        int idArbitro = Sesion.getInstancia().getUsuario().getIdUsuario();
+        List<Partido> lista = partidoDAO.listarPorArbitro(idArbitro);
+        for (Partido p : lista) {
+            String marcador = "finalizado".equals(p.getEstadoResultado())
+                              ? p.getPuntosLocal() + " - " + p.getPuntosVisit()
+                              : "-";
+            modeloTabla.addRow(new Object[]{
+                p.getIdPartido(),
+                p.getFecha().toString().replace("T", " "),
+                p.getNombreEquipoLocal(),
+                p.getNombreEquipoVisit(),
+                p.getNombreTorneo(),
+                p.getLugar(),
+                p.getEstadoResultado() != null ? p.getEstadoResultado() : "pendiente",
+                marcador
+            });
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this,
+            "Error al cargar partidos: " + e.getMessage(),
+            "Error", JOptionPane.ERROR_MESSAGE);
     }
+}
+
+    public IFPartidos() {   
+    initComponents();
+    configurarTabla();
+    cargarPartidos();
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -26,26 +80,105 @@ public class IFPartidos extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        btnRefrescar = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblPartidos = new javax.swing.JTable();
+
         setBorder(null);
         setClosable(true);
         setResizable(true);
         setAutoscrolls(true);
 
+        jPanel1.setBackground(new java.awt.Color(0, 0, 0));
+
+        jLabel1.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("Mis partidos asignados");
+        jLabel1.setOpaque(true);
+
+        btnRefrescar.setBackground(new java.awt.Color(255, 153, 51));
+        btnRefrescar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnRefrescar.setForeground(new java.awt.Color(255, 255, 255));
+        btnRefrescar.setText("Refrescar");
+        btnRefrescar.addActionListener(this::btnRefrescarActionPerformed);
+
+        tblPartidos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(tblPartidos);
+
+        jScrollPane1.setViewportView(jScrollPane3);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(252, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnRefrescar, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(211, 211, 211))))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnRefrescar, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(52, 52, 52)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+                .addGap(18, 18, 18))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 406, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 286, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnRefrescarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefrescarActionPerformed
+        // TODO add your handling code here:
+        cargarPartidos();
+    }//GEN-LAST:event_btnRefrescarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnRefrescar;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTable tblPartidos;
     // End of variables declaration//GEN-END:variables
 }
