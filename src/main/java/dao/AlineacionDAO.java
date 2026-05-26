@@ -14,7 +14,7 @@ public class AlineacionDAO {
     }
 
     public boolean insertar(Alineacion alineacion) throws SQLException {
-        String sql = "INSERT INTO ALINEACION (id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id) VALUES (?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO ALINEACION (id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id, tipo) VALUES (?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = getConn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, alineacion.getIdPartido());
             ps.setInt(2, alineacion.getIdEquipo());
@@ -23,6 +23,7 @@ public class AlineacionDAO {
             ps.setInt(5, alineacion.getAleroId());
             ps.setInt(6, alineacion.getAlaPivotId());
             ps.setInt(7, alineacion.getPivotId());
+            ps.setString(8, alineacion.getTipoDb());
             if (ps.executeUpdate() > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
@@ -36,7 +37,7 @@ public class AlineacionDAO {
     }
 
     public boolean actualizar(Alineacion alineacion) throws SQLException {
-        String sql = "UPDATE ALINEACION SET id_partido=?, id_equipo=?, base_id=?, escolta_id=?, alero_id=?, ala_pivot_id=?, pivot_id=? WHERE id_alineacion=?";
+        String sql = "UPDATE ALINEACION SET id_partido=?, id_equipo=?, base_id=?, escolta_id=?, alero_id=?, ala_pivot_id=?, pivot_id=?, tipo=? WHERE id_alineacion=?";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setInt(1, alineacion.getIdPartido());
             ps.setInt(2, alineacion.getIdEquipo());
@@ -45,7 +46,8 @@ public class AlineacionDAO {
             ps.setInt(5, alineacion.getAleroId());
             ps.setInt(6, alineacion.getAlaPivotId());
             ps.setInt(7, alineacion.getPivotId());
-            ps.setInt(8, alineacion.getIdAlineacion());
+            ps.setString(8, alineacion.getTipoDb());
+            ps.setInt(9, alineacion.getIdAlineacion());
             return ps.executeUpdate() > 0;
         }
     }
@@ -59,7 +61,7 @@ public class AlineacionDAO {
     }
 
     public Alineacion buscarPorId(int idAlineacion) throws SQLException {
-        String sql = "SELECT id_alineacion, id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id FROM ALINEACION WHERE id_alineacion=?";
+        String sql = "SELECT id_alineacion, id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id, tipo FROM ALINEACION WHERE id_alineacion=?";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setInt(1, idAlineacion);
             try (ResultSet rs = ps.executeQuery()) {
@@ -72,7 +74,7 @@ public class AlineacionDAO {
     }
 
     public Alineacion buscarPorPartidoYEquipo(int idPartido, int idEquipo) throws SQLException {
-        String sql = "SELECT id_alineacion, id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id FROM ALINEACION WHERE id_partido=? AND id_equipo=?";
+        String sql = "SELECT id_alineacion, id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id, tipo FROM ALINEACION WHERE id_partido=? AND id_equipo=?";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setInt(1, idPartido);
             ps.setInt(2, idEquipo);
@@ -87,7 +89,7 @@ public class AlineacionDAO {
 
     public List<Alineacion> listarPorPartido(int idPartido) throws SQLException {
         List<Alineacion> lista = new ArrayList<>();
-        String sql = "SELECT id_alineacion, id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id FROM ALINEACION WHERE id_partido=? ORDER BY id_equipo";
+        String sql = "SELECT id_alineacion, id_partido, id_equipo, base_id, escolta_id, alero_id, ala_pivot_id, pivot_id, tipo FROM ALINEACION WHERE id_partido=? ORDER BY id_equipo";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setInt(1, idPartido);
             try (ResultSet rs = ps.executeQuery()) {
@@ -109,7 +111,7 @@ public class AlineacionDAO {
     }
 
     private Alineacion mapear(ResultSet rs) throws SQLException {
-        return new Alineacion(
+        Alineacion a = new Alineacion(
                 rs.getInt("id_alineacion"),
                 rs.getInt("id_partido"),
                 rs.getInt("id_equipo"),
@@ -119,5 +121,7 @@ public class AlineacionDAO {
                 rs.getInt("ala_pivot_id"),
                 rs.getInt("pivot_id")
         );
+        a.setTipoDb(rs.getString("tipo"));
+        return a;
     }
 }

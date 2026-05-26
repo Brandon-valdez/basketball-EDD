@@ -65,6 +65,9 @@ public class Partido {
 
     @Override
     public String toString() {
-        return nombreEquipoLocal + " vs " + nombreEquipoVisit + " — " + fecha.toLocalDate();
+        String local = nombreEquipoLocal != null ? nombreEquipoLocal : ("Equipo " + idEquipoLocal);
+        String visit = nombreEquipoVisit != null ? nombreEquipoVisit : ("Equipo " + idEquipoVisit);
+        String fechaTexto = fecha != null ? fecha.toLocalDate().toString() : "sin fecha";
+        return local + " vs " + visit + " — " + fechaTexto;
     }
 }

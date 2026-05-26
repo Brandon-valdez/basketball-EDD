@@ -80,4 +80,13 @@ public class SuplenteDAO {
         }
         return lista;
     }
+
+    public boolean eliminarPorAlineacion(int idAlineacion) throws SQLException {
+        String sql = "DELETE FROM SUPLENTES WHERE id_alineacion=?";
+        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+            ps.setInt(1, idAlineacion);
+            ps.executeUpdate();
+            return true;
+        }
+    }
 }

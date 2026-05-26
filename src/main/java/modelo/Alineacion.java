@@ -1,6 +1,35 @@
 package modelo;
 
 public class Alineacion {
+    public enum TipoAlineacion {
+        OFENSIVO("Ofensivo"),
+        DEFENSIVO("Defensivo");
+
+        private final String valorDb;
+
+        TipoAlineacion(String valorDb) {
+            this.valorDb = valorDb;
+        }
+
+        public String getValorDb() {
+            return valorDb;
+        }
+
+        public static TipoAlineacion fromDb(String valor) {
+            if (valor == null) {
+                return null;
+            }
+            String normalizado = valor.trim().toLowerCase();
+            if ("ofensivo".equals(normalizado)) {
+                return OFENSIVO;
+            }
+            if ("defensivo".equals(normalizado)) {
+                return DEFENSIVO;
+            }
+            return null;
+        }
+    }
+
     private int idAlineacion;
     private int idPartido;
     private int idEquipo;
@@ -9,9 +38,18 @@ public class Alineacion {
     private int aleroId;
     private int alaPivotId;
     private int pivotId;
+    private TipoAlineacion tipo;
+
+    public Alineacion() {
+    }
 
     public Alineacion(int idAlineacion, int idPartido, int idEquipo, int baseId, int escoltaId,
             int aleroId, int alaPivotId, int pivotId) {
+        this(idAlineacion, idPartido, idEquipo, baseId, escoltaId, aleroId, alaPivotId, pivotId, null);
+    }
+
+    public Alineacion(int idAlineacion, int idPartido, int idEquipo, int baseId, int escoltaId,
+            int aleroId, int alaPivotId, int pivotId, TipoAlineacion tipo) {
         this.idAlineacion = idAlineacion;
         this.idPartido = idPartido;
         this.idEquipo = idEquipo;
@@ -20,6 +58,7 @@ public class Alineacion {
         this.aleroId = aleroId;
         this.alaPivotId = alaPivotId;
         this.pivotId = pivotId;
+        this.tipo = tipo;
     }
 
     public int getIdAlineacion() {
@@ -54,6 +93,14 @@ public class Alineacion {
         return pivotId;
     }
 
+    public TipoAlineacion getTipo() {
+        return tipo;
+    }
+
+    public String getTipoDb() {
+        return tipo == null ? null : tipo.getValorDb();
+    }
+
     public void setIdAlineacion(int idAlineacion) {
         this.idAlineacion = idAlineacion;
     }
@@ -84,5 +131,13 @@ public class Alineacion {
 
     public void setPivotId(int pivotId) {
         this.pivotId = pivotId;
+    }
+
+    public void setTipo(TipoAlineacion tipo) {
+        this.tipo = tipo;
+    }
+
+    public void setTipoDb(String tipo) {
+        this.tipo = TipoAlineacion.fromDb(tipo);
     }
 }

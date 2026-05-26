@@ -6,6 +6,9 @@ public class Suplente {
     private int idJugador;
     private Integer ordenIngreso;
 
+    public Suplente() {
+    }
+
     public Suplente(int idSuplente, int idAlineacion, int idJugador, Integer ordenIngreso) {
         this.idSuplente = idSuplente;
         this.idAlineacion = idAlineacion;
