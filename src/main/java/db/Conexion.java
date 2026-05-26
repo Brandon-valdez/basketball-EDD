@@ -12,7 +12,7 @@ public class Conexion {
 
     private static final String URL      = "jdbc:mysql://localhost:3306/torneos_baloncesto?useSSL=false&serverTimezone=America/El_Salvador";
     private static final String USUARIO  = "root";
-    private static final String PASSWORD = "";
+    private static final String PASSWORD = "1234";
 
     private static Conexion instancia;
     private Connection conexion;
