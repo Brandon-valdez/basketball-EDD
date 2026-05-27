@@ -132,6 +132,7 @@ private void configurarRol() {
             btnJugadores.setVisible(true);
             btnPartidos.setVisible(true);
             btnAlineacion.setVisible(true);
+            btnTorneos.setVisible(true);
             break;
 
         case "ARBITRO":
@@ -306,19 +307,18 @@ private void abrirVentana(javax.swing.JInternalFrame ventana) {
                                     .addComponent(btnUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(btnDashboard, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(btnCrearEquipos)))
-                            .addComponent(lblUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanelMenuLayout.createSequentialGroup()
-                                .addGap(16, 16, 16)
                                 .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMenuLayout.createSequentialGroup()
-                                        .addComponent(lblRol, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(24, 42, Short.MAX_VALUE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMenuLayout.createSequentialGroup()
-                                        .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGap(54, 88, Short.MAX_VALUE))))))
+                                    .addComponent(lblUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanelMenuLayout.createSequentialGroup()
+                                        .addGap(16, 16, 16)
+                                        .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(lblRol, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGroup(jPanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addGap(24, 24, Short.MAX_VALUE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMenuLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(btnCerrarSesion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -411,9 +411,14 @@ private void abrirVentana(javax.swing.JInternalFrame ventana) {
     }//GEN-LAST:event_btnJugadoresActionPerformed
 
     private void btnTorneosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTorneosActionPerformed
-        IFTorneos torneos = new IFTorneos();
+        modelo.Usuario usuarioActual = Sesion.getInstancia().getUsuario();
+        boolean esCoach = usuarioActual != null
+                && usuarioActual.getNombreRol() != null
+                && "COACH".equalsIgnoreCase(usuarioActual.getNombreRol().trim());
 
-    abrirVentana(torneos);
+        javax.swing.JInternalFrame torneos = esCoach ? new IFInscribir() : new IFTorneos();
+        abrirVentana(torneos);
+
     }//GEN-LAST:event_btnTorneosActionPerformed
 
     private void btnPartidosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPartidosActionPerformed
