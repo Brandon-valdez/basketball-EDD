@@ -4,12 +4,26 @@
  */
 package vistas;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import dao.EquipoDAO;
 import dao.PartidoDAO;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import modelo.Equipo;
 import modelo.Partido;
@@ -36,6 +50,8 @@ public class IFPartidosCoach extends javax.swing.JInternalFrame {
         inicializarTablas();
         // Registrar listeners antes de cargar datos para que la selección inicial dispare eventos
         agregarListenersTablas();
+        btnReportePendiente.addActionListener(this::btnReportePendienteActionPerformed);
+        btnReporteFinalizado.addActionListener(this::btnReporteFinalizadoActionPerformed);
         cargarPartidosDelCoach();
     }
 
@@ -56,12 +72,14 @@ public class IFPartidosCoach extends javax.swing.JInternalFrame {
         jLabel6 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
+        btnReportePendiente = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
         jLabel7 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         txtpDetallePartido = new javax.swing.JTextPane();
+        btnReporteFinalizado = new javax.swing.JButton();
 
         setBorder(null);
         setClosable(true);
@@ -97,8 +115,15 @@ public class IFPartidosCoach extends javax.swing.JInternalFrame {
         jLabel6.setForeground(new java.awt.Color(255, 51, 0));
         jLabel6.setText("Partidos pendientes");
 
-        jTextPane1.setForeground(new java.awt.Color(0, 0, 0));
+        jTextPane1.setBackground(new java.awt.Color(0, 0, 0));
+        jTextPane1.setBorder(null);
+        jTextPane1.setForeground(new java.awt.Color(255, 255, 255));
         jScrollPane2.setViewportView(jTextPane1);
+
+        btnReportePendiente.setBackground(new java.awt.Color(255, 102, 0));
+        btnReportePendiente.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnReportePendiente.setForeground(new java.awt.Color(255, 255, 255));
+        btnReportePendiente.setText("Descargar Reporte");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -108,9 +133,13 @@ public class IFPartidosCoach extends javax.swing.JInternalFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 691, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnReportePendiente, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(62, 62, 62))))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(232, 232, 232)
                         .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -124,7 +153,11 @@ public class IFPartidosCoach extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(35, 35, 35)
+                        .addComponent(btnReportePendiente, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(33, Short.MAX_VALUE))
         );
 
@@ -153,8 +186,14 @@ public class IFPartidosCoach extends javax.swing.JInternalFrame {
         jLabel7.setText("Partidos Finalizados");
 
         txtpDetallePartido.setBackground(new java.awt.Color(0, 0, 0));
+        txtpDetallePartido.setBorder(null);
         txtpDetallePartido.setForeground(new java.awt.Color(255, 255, 255));
         jScrollPane4.setViewportView(txtpDetallePartido);
+
+        btnReporteFinalizado.setBackground(new java.awt.Color(255, 102, 0));
+        btnReporteFinalizado.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnReporteFinalizado.setForeground(new java.awt.Color(255, 255, 255));
+        btnReporteFinalizado.setText("Descargar Reportes");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -169,7 +208,10 @@ public class IFPartidosCoach extends javax.swing.JInternalFrame {
                         .addGap(15, 15, 15)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 691, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 392, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(120, 120, 120)
+                                .addComponent(btnReporteFinalizado, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(19, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -179,8 +221,13 @@ public class IFPartidosCoach extends javax.swing.JInternalFrame {
                 .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(44, 44, 44)
+                        .addComponent(btnReporteFinalizado, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(48, Short.MAX_VALUE))
         );
 
@@ -402,8 +449,259 @@ public class IFPartidosCoach extends javax.swing.JInternalFrame {
         mostrarDetallePartido(p, txtpDetallePartido);
     }
 
+    private void btnReportePendienteActionPerformed(java.awt.event.ActionEvent evt) {
+        generarReportePendientesPDF();
+    }
+
+    private void btnReporteFinalizadoActionPerformed(java.awt.event.ActionEvent evt) {
+        generarReporteFinalizadosPDF();
+    }
+
+    private void generarReportePendientesPDF() {
+        try {
+            if (listaPendientes == null || listaPendientes.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "No hay partidos pendientes para generar el reporte.",
+                        "Sin datos",
+                        JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            JFileChooser chooser = new JFileChooser();
+            chooser.setDialogTitle("Guardar reporte PDF de partidos pendientes");
+            chooser.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)", "pdf"));
+            chooser.setSelectedFile(new File("Reporte_Partidos_Pendientes.pdf"));
+
+            if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+                return;
+            }
+
+            String ruta = chooser.getSelectedFile().getAbsolutePath();
+            if (!ruta.toLowerCase().endsWith(".pdf")) {
+                ruta += ".pdf";
+            }
+
+            Equipo equipo = equipoDAO.buscarPorUsuario(Sesion.getInstancia().getUsuario().getIdUsuario());
+            String nombreEquipo = equipo != null ? equipo.getNombre() : "Mi Equipo";
+
+            Document doc = new Document(PageSize.A4);
+            PdfWriter.getInstance(doc, new FileOutputStream(ruta));
+            doc.open();
+
+            Font fTitulo = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, new BaseColor(255, 102, 0));
+            Font fSeccion = new Font(Font.FontFamily.HELVETICA, 13, Font.BOLD, BaseColor.WHITE);
+            Font fHeader = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.WHITE);
+            Font fCelda = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.WHITE);
+            Font fSub = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, new BaseColor(180, 180, 180));
+
+            BaseColor negro = new BaseColor(0, 0, 0);
+            BaseColor grisOscuro = new BaseColor(30, 30, 30);
+            BaseColor naranja = new BaseColor(255, 102, 0);
+
+            doc.add(new Paragraph(" "));
+
+            Paragraph titulo = new Paragraph("BKB MANAGER — Reporte de Partidos Pendientes", fTitulo);
+            titulo.setAlignment(Element.ALIGN_CENTER);
+            titulo.setSpacingAfter(4);
+            doc.add(titulo);
+
+            Paragraph subtitulo = new Paragraph(nombreEquipo, fSeccion);
+            subtitulo.setAlignment(Element.ALIGN_CENTER);
+            subtitulo.setSpacingAfter(10);
+            doc.add(subtitulo);
+
+            Paragraph info = new Paragraph("Total de partidos pendientes: " + listaPendientes.size(), fSub);
+            info.setAlignment(Element.ALIGN_LEFT);
+            info.setSpacingAfter(12);
+            doc.add(info);
+
+            PdfPTable tabla = new PdfPTable(6);
+            tabla.setWidthPercentage(100);
+            tabla.setSpacingAfter(12);
+            tabla.setWidths(new float[]{1.1f, 2.2f, 2.2f, 2.3f, 2.3f, 1.2f});
+
+            String[] headers = {"ID", "Local", "Visitante", "Fecha", "Lugar", "Estado"};
+            for (String h : headers) {
+                PdfPCell cell = new PdfPCell(new Phrase(h, fHeader));
+                cell.setBackgroundColor(naranja);
+                cell.setBorderColor(negro);
+                cell.setPadding(6);
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tabla.addCell(cell);
+            }
+
+            DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            boolean alterno = false;
+            for (Partido p : listaPendientes) {
+                BaseColor bg = alterno ? grisOscuro : new BaseColor(15, 15, 15);
+                alterno = !alterno;
+
+                String fecha = p.getFecha() != null ? p.getFecha().format(df) : "-";
+                Object[] fila = new Object[]{
+                    p.getIdPartido(),
+                    p.getNombreEquipoLocal(),
+                    p.getNombreEquipoVisit(),
+                    fecha,
+                    p.getLugar() != null ? p.getLugar() : "-",
+                    p.getEstadoResultado() != null ? p.getEstadoResultado() : "-"
+                };
+
+                for (Object val : fila) {
+                    PdfPCell cell = new PdfPCell(new Phrase(val != null ? val.toString() : "—", fCelda));
+                    cell.setBackgroundColor(bg);
+                    cell.setBorderColor(new BaseColor(60, 60, 60));
+                    cell.setPadding(5);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    tabla.addCell(cell);
+                }
+            }
+
+            doc.add(tabla);
+            doc.add(new Paragraph("Descargado: " + java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")), fSub));
+            doc.close();
+
+            JOptionPane.showMessageDialog(this,
+                    "Reporte PDF generado correctamente.\n\nArchivo: " + ruta,
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error al generar el reporte PDF:\n" + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
+
+    private void generarReporteFinalizadosPDF() {
+        try {
+            if (listaFinalizados == null || listaFinalizados.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "No hay partidos finalizados para generar el reporte.",
+                        "Sin datos",
+                        JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            JFileChooser chooser = new JFileChooser();
+            chooser.setDialogTitle("Guardar reporte PDF de partidos finalizados");
+            chooser.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)", "pdf"));
+            chooser.setSelectedFile(new File("Reporte_Partidos_Finalizados.pdf"));
+
+            if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+                return;
+            }
+
+            String ruta = chooser.getSelectedFile().getAbsolutePath();
+            if (!ruta.toLowerCase().endsWith(".pdf")) {
+                ruta += ".pdf";
+            }
+
+            Equipo equipo = equipoDAO.buscarPorUsuario(Sesion.getInstancia().getUsuario().getIdUsuario());
+            String nombreEquipo = equipo != null ? equipo.getNombre() : "Mi Equipo";
+
+            Document doc = new Document(PageSize.A4);
+            PdfWriter.getInstance(doc, new FileOutputStream(ruta));
+            doc.open();
+
+            Font fTitulo = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, new BaseColor(255, 102, 0));
+            Font fSeccion = new Font(Font.FontFamily.HELVETICA, 13, Font.BOLD, BaseColor.WHITE);
+            Font fHeader = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.WHITE);
+            Font fCelda = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, BaseColor.WHITE);
+            Font fSub = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL, new BaseColor(180, 180, 180));
+
+            BaseColor negro = new BaseColor(0, 0, 0);
+            BaseColor grisOscuro = new BaseColor(30, 30, 30);
+            BaseColor naranja = new BaseColor(255, 102, 0);
+
+            doc.add(new Paragraph(" "));
+
+            Paragraph titulo = new Paragraph("BKB MANAGER — Reporte de Partidos Finalizados", fTitulo);
+            titulo.setAlignment(Element.ALIGN_CENTER);
+            titulo.setSpacingAfter(4);
+            doc.add(titulo);
+
+            Paragraph subtitulo = new Paragraph(nombreEquipo, fSeccion);
+            subtitulo.setAlignment(Element.ALIGN_CENTER);
+            subtitulo.setSpacingAfter(10);
+            doc.add(subtitulo);
+
+            Paragraph info = new Paragraph("Total de partidos finalizados: " + listaFinalizados.size(), fSub);
+            info.setAlignment(Element.ALIGN_LEFT);
+            info.setSpacingAfter(12);
+            doc.add(info);
+
+            PdfPTable tabla = new PdfPTable(8);
+            tabla.setWidthPercentage(100);
+            tabla.setSpacingAfter(12);
+            tabla.setWidths(new float[]{0.9f, 2.0f, 2.0f, 2.0f, 1.7f, 1.2f, 1.2f, 2.0f});
+
+            String[] headers = {"ID", "Local", "Visitante", "Fecha", "Lugar", "Pts L", "Pts V", "Ganador"};
+            for (String h : headers) {
+                PdfPCell cell = new PdfPCell(new Phrase(h, fHeader));
+                cell.setBackgroundColor(naranja);
+                cell.setBorderColor(negro);
+                cell.setPadding(6);
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tabla.addCell(cell);
+            }
+
+            DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            boolean alterno = false;
+            for (Partido p : listaFinalizados) {
+                BaseColor bg = alterno ? grisOscuro : new BaseColor(15, 15, 15);
+                alterno = !alterno;
+
+                String fecha = p.getFecha() != null ? p.getFecha().format(df) : "-";
+                String ganador = "Empate";
+                if (p.getPuntosLocal() > p.getPuntosVisit()) {
+                    ganador = p.getNombreEquipoLocal() != null ? p.getNombreEquipoLocal() : "Local";
+                } else if (p.getPuntosVisit() > p.getPuntosLocal()) {
+                    ganador = p.getNombreEquipoVisit() != null ? p.getNombreEquipoVisit() : "Visitante";
+                }
+
+                Object[] fila = new Object[]{
+                    p.getIdPartido(),
+                    p.getNombreEquipoLocal(),
+                    p.getNombreEquipoVisit(),
+                    fecha,
+                    p.getLugar() != null ? p.getLugar() : "-",
+                    p.getPuntosLocal(),
+                    p.getPuntosVisit(),
+                    ganador
+                };
+
+                for (Object val : fila) {
+                    PdfPCell cell = new PdfPCell(new Phrase(val != null ? val.toString() : "—", fCelda));
+                    cell.setBackgroundColor(bg);
+                    cell.setBorderColor(new BaseColor(60, 60, 60));
+                    cell.setPadding(5);
+                    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    tabla.addCell(cell);
+                }
+            }
+
+            doc.add(tabla);
+            doc.add(new Paragraph("Descargado: " + java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")), fSub));
+            doc.close();
+
+            JOptionPane.showMessageDialog(this,
+                    "Reporte PDF generado correctamente.\n\nArchivo: " + ruta,
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error al generar el reporte PDF:\n" + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnReporteFinalizado;
+    private javax.swing.JButton btnReportePendiente;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;

@@ -4,6 +4,7 @@
  */
 package vistas;
 
+import dao.UsuarioDAO;
 import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -229,7 +230,22 @@ public class Login_BKB extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new Login_BKB().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> {
+            try {
+                UsuarioDAO usuarioDAO = new UsuarioDAO();
+                if (usuarioDAO.contarUsuarios() == 0) {
+                    new AgregarAdmin().setVisible(true);
+                } else {
+                    new Login_BKB().setVisible(true);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null,
+                        "No se pudo validar usuarios iniciales.\n" + ex.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                new Login_BKB().setVisible(true);
+            }
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

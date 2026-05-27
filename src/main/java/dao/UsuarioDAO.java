@@ -214,4 +214,15 @@ private int buscarIdArbitro(String nombreCompleto) throws SQLException {
             }
         }
     }
+
+    /**
+     * CONTAR USUARIOS REGISTRADOS
+     */
+    public int contarUsuarios() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM USUARIOS";
+        try (Statement st = getConn().createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
 }

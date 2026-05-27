@@ -29,6 +29,7 @@ public class IFCrearEquipo extends javax.swing.JInternalFrame {
     private IFMiEquipo miEquipo;
     private Equipo equipoActual;
     private boolean esEdicion = false;
+    private boolean ocultarSeccionListados = false;
 
     /**
      * Creates new form IFMiEquipo
@@ -38,10 +39,10 @@ public class IFCrearEquipo extends javax.swing.JInternalFrame {
         txtImagen.setEditable(false);
         esEdicion = false;
         btnCrear.setText("Crear Equipo");
-        cargarEquipos();
-tblEquipos.getSelectionModel().addListSelectionListener(e -> {
-    if (!e.getValueIsAdjusting()) cargarJugadoresDelEquipo();
-});
+        btnImage.addActionListener(this::btnImageActionPerformed);
+        btnCrear.addActionListener(this::btnCrearActionPerformed);
+        ocultarSeccionListados = esCoachActual();
+        configurarSeccionListados();
     }
 
     public IFCrearEquipo(IFMiEquipo miEquipo) {
@@ -55,6 +56,36 @@ tblEquipos.getSelectionModel().addListSelectionListener(e -> {
         this.equipoActual = equipoParaEditar;
         this.esEdicion = true;
         cargarDatosEdicion();
+    }
+
+    private boolean esCoachActual() {
+        return Sesion.getInstancia() != null
+                && Sesion.getInstancia().estaLogueado()
+                && Sesion.getInstancia().getUsuario() != null
+                && Sesion.getInstancia().getUsuario().getNombreRol() != null
+                && "coach".equalsIgnoreCase(Sesion.getInstancia().getUsuario().getNombreRol().trim());
+    }
+
+    private void configurarSeccionListados() {
+        if (ocultarSeccionListados) {
+            jPanel3.setVisible(false);
+            jPanel4.setVisible(false);
+            jScrollPane1.setVisible(false);
+            jScrollPane2.setVisible(false);
+            tblEquipos.setVisible(false);
+            tblJugadores.setVisible(false);
+            revalidate();
+            repaint();
+            return;
+        }
+
+        cargarEquipos();
+        tblEquipos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tblEquipos.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                cargarJugadoresDelEquipo();
+            }
+        });
     }
 
     private void cargarDatosEdicion() {
@@ -146,31 +177,28 @@ tblEquipos.getSelectionModel().addListSelectionListener(e -> {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(27, 27, 27)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtCiudad))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnImage)
-                        .addContainerGap(60, Short.MAX_VALUE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtCiudad))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(75, 75, 75))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnImage)
+                            .addComponent(txtImagen))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 101, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(35, 35, 35))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(260, 260, 260)
                 .addComponent(btnCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(260, 260, 260))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -184,18 +212,20 @@ tblEquipos.getSelectionModel().addListSelectionListener(e -> {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
-                            .addComponent(txtCiudad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addComponent(txtCiudad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(15, 15, 15)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtImagen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnImage))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnImage)
-                    .addComponent(txtImagen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
-                .addGap(2, 2, 2)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnCrear)
-                .addContainerGap(7, Short.MAX_VALUE))
+                .addGap(42, 42, 42))
         );
 
         tblEquipos.setModel(new javax.swing.table.DefaultTableModel(
@@ -229,7 +259,7 @@ tblEquipos.getSelectionModel().addListSelectionListener(e -> {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addComponent(jLabel6)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         jPanel4.setBackground(new java.awt.Color(51, 51, 51));
@@ -250,7 +280,7 @@ tblEquipos.getSelectionModel().addListSelectionListener(e -> {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(14, 14, 14)
                 .addComponent(jLabel7)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tblJugadores.setModel(new javax.swing.table.DefaultTableModel(
@@ -289,23 +319,23 @@ tblEquipos.getSelectionModel().addListSelectionListener(e -> {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(331, 331, 331)
                         .addComponent(jLabel5)))
-                .addContainerGap(66, Short.MAX_VALUE))
+                .addContainerGap(121, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(44, 44, 44)
+                .addGap(49, 49, 49)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(24, 24, 24)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(76, 76, 76)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addGap(638, 638, 638))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 249, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(568, 568, 568))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -513,8 +543,18 @@ private void cargarEquipos() {
             });
         }
         tblEquipos.setModel(model);
+        tblEquipos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tblEquipos.getColumnModel().getColumn(0).setMaxWidth(0);
         tblEquipos.getColumnModel().getColumn(0).setMinWidth(0); // ocultar ID
+
+        if (model.getRowCount() > 0) {
+            tblEquipos.setRowSelectionInterval(0, 0);
+        } else {
+            tblJugadores.setModel(new DefaultTableModel(new Object[]{"Nombre", "Apellido", "Posición", "Dorsal"}, 0) {
+                @Override public boolean isCellEditable(int r, int c) { return false; }
+            });
+            jLabel7.setText("Jugadores");
+        }
     } catch (SQLException ex) {
         JOptionPane.showMessageDialog(this, "Error al cargar equipos: " + ex.getMessage());
     }
@@ -522,7 +562,9 @@ private void cargarEquipos() {
 
 private void cargarJugadoresDelEquipo() {
     int fila = tblEquipos.getSelectedRow();
-    if (fila < 0) return;
+    if (fila < 0) {
+        return;
+    }
 
     int idEquipo = (int) tblEquipos.getValueAt(fila, 0);
 
