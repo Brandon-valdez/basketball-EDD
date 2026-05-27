@@ -123,6 +123,8 @@ public class IFCrearEquipo extends javax.swing.JInternalFrame {
         btnImage = new javax.swing.JButton();
         btnCrear = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        btnEditar = new javax.swing.JButton();
+        btnBorrar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblEquipos = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
@@ -171,6 +173,18 @@ public class IFCrearEquipo extends javax.swing.JInternalFrame {
         btnCrear.setForeground(new java.awt.Color(255, 255, 255));
         btnCrear.setText("Crear Equipo");
 
+        btnEditar.setBackground(new java.awt.Color(255, 102, 0));
+        btnEditar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnEditar.setForeground(new java.awt.Color(255, 255, 255));
+        btnEditar.setText("Editar Equipo");
+        btnEditar.addActionListener(this::btnEditarActionPerformed);
+
+        btnBorrar.setBackground(new java.awt.Color(255, 102, 0));
+        btnBorrar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnBorrar.setForeground(new java.awt.Color(255, 255, 255));
+        btnBorrar.setText("Borrar Equipo");
+        btnBorrar.addActionListener(this::btnBorrarActionPerformed);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -195,10 +209,17 @@ public class IFCrearEquipo extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 101, Short.MAX_VALUE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(35, 35, 35))
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(260, 260, 260)
-                .addComponent(btnCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(137, 137, 137)
+                .addComponent(btnCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGap(45, 45, 45)
+                    .addComponent(btnBorrar, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(491, Short.MAX_VALUE)))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -223,9 +244,20 @@ public class IFCrearEquipo extends javax.swing.JInternalFrame {
                         .addContainerGap()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnCrear)
-                .addGap(42, 42, 42))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(btnCrear)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                        .addComponent(btnEditar)
+                        .addGap(34, 34, 34))))
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                    .addContainerGap(203, Short.MAX_VALUE)
+                    .addComponent(btnBorrar)
+                    .addGap(33, 33, 33)))
         );
 
         tblEquipos.setModel(new javax.swing.table.DefaultTableModel(
@@ -325,9 +357,9 @@ public class IFCrearEquipo extends javax.swing.JInternalFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(49, 49, 49)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -395,6 +427,103 @@ public class IFCrearEquipo extends javax.swing.JInternalFrame {
     private void txtImagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtImagenActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtImagenActionPerformed
+
+    private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarActionPerformed
+        // TODO add your handling code here:
+        int fila = tblEquipos.getSelectedRow();
+    if (fila < 0) {
+        JOptionPane.showMessageDialog(this,
+                "Selecciona un equipo de la tabla para eliminarlo.",
+                "Sin selección",
+                JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    int idEquipo = (int) tblEquipos.getValueAt(fila, 0);
+    String nombreEquipo = (String) tblEquipos.getValueAt(fila, 1);
+
+    int confirmacion = JOptionPane.showConfirmDialog(this,
+            "¿Estás seguro de que deseas eliminar el equipo \"" + nombreEquipo + "\"?",
+            "Confirmar eliminación",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+
+    if (confirmacion != JOptionPane.YES_OPTION) return;
+
+    try {
+        EquipoDAO dao = new EquipoDAO();
+        Equipo equipo = dao.buscarPorId(idEquipo);
+        if (equipo != null && dao.eliminar(equipo.getIdEquipo())) {
+            JOptionPane.showMessageDialog(this,
+                    "Equipo eliminado correctamente.",
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE);
+            cargarEquipos(); // refresca la tabla
+            tblJugadores.setModel(new DefaultTableModel(
+                    new Object[]{"Nombre", "Apellido", "Posición", "Dorsal"}, 0));
+            jLabel1.setIcon(null);
+            jLabel1.setText("");
+            if (miEquipo != null) miEquipo.recargar();
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo eliminar el equipo.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this,
+                "Error al eliminar:\n" + ex.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_btnBorrarActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        // TODO add your handling code here:
+        int fila = tblEquipos.getSelectedRow();
+    if (fila < 0) {
+        JOptionPane.showMessageDialog(this,
+                "Selecciona un equipo de la tabla para editarlo.",
+                "Sin selección",
+                JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    int idEquipo = (int) tblEquipos.getValueAt(fila, 0);
+
+    try {
+        Equipo equipo = new EquipoDAO().buscarPorId(idEquipo);
+        if (equipo == null) {
+            JOptionPane.showMessageDialog(this, "No se encontró el equipo.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Rellena el formulario con los datos del equipo seleccionado
+        txtNombre.setText(equipo.getNombre());
+        txtCiudad.setText(equipo.getCiudad());
+        if (equipo.getLogo() != null && !equipo.getLogo().isBlank()) {
+            txtImagen.setText(equipo.getLogo());
+            mostrarVistaPrevia(equipo.getLogo());
+        } else {
+            txtImagen.setText("");
+            jLabel1.setIcon(null);
+            jLabel1.setText("");
+        }
+
+        // Cambia el modo a edición
+        this.equipoActual = equipo;
+        this.esEdicion = true;
+        btnCrear.setText("Actualizar Equipo");
+        jLabel5.setText("Editar Equipo");
+
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this,
+                "Error al cargar el equipo:\n" + ex.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_btnEditarActionPerformed
 
     private void crearEquipo(String nombre, String ciudad, String logo) {
         try {
@@ -505,7 +634,9 @@ public class IFCrearEquipo extends javax.swing.JInternalFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBorrar;
     private javax.swing.JButton btnCrear;
+    private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnImage;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -569,6 +700,15 @@ private void cargarJugadoresDelEquipo() {
     int idEquipo = (int) tblEquipos.getValueAt(fila, 0);
 
     try {
+        // Cargar el equipo para obtener la imagen
+        Equipo equipo = new EquipoDAO().buscarPorId(idEquipo);
+        if (equipo != null && equipo.getLogo() != null && !equipo.getLogo().isBlank()) {
+            mostrarVistaPrevia(equipo.getLogo());
+        } else {
+            jLabel1.setIcon(null);
+            jLabel1.setText("Sin imagen");
+        }
+
         List<Jugador> jugadores = new JugadorDAO().listarPorEquipo(idEquipo);
         DefaultTableModel model = new DefaultTableModel(
             new Object[]{"Nombre", "Apellido", "Posición", "Dorsal"}, 0) {

@@ -10,9 +10,9 @@ import java.sql.SQLException;
  */
 public class Conexion {
 
-    private static final String URL      = "jdbc:mysql://localhost:3306/torneos_baloncesto?useSSL=false&serverTimezone=America/El_Salvador";
+    private static final String URL = "jdbc:mysql://localhost:3306/torneos_baloncesto?allowPublicKeyRetrieval=true&useSSL=false";
     private static final String USUARIO  = "root";
-    private static final String PASSWORD = "1234";
+    private static final String PASSWORD = "juss07lems";
     private static Conexion instancia;
     private Connection conexion;
 
