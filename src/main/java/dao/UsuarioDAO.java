@@ -18,44 +18,65 @@ public class UsuarioDAO {
      */
     public Usuario login(String email, String password) throws SQLException {
 
-        String sql = """
-                SELECT u.id_usuario,
-                       u.nombre,
-                       u.email,
-                       u.contrasena,
-                       u.id_rol,
-                       r.nombre_rol
-                FROM USUARIOS u
-                JOIN ROL r ON r.id_rol = u.id_rol
-                WHERE u.email = ?
-                AND u.contrasena = SHA2(?, 256)
-                """;
+    String sql = """
+            SELECT u.id_usuario,
+                   u.nombre,
+                   u.email,
+                   u.contrasena,
+                   u.id_rol,
+                   r.nombre_rol
+            FROM USUARIOS u
+            JOIN ROL r ON r.id_rol = u.id_rol
+            WHERE u.email = ?
+            AND u.contrasena = SHA2(?, 256)
+            """;
 
-        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+    try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+        ps.setString(1, email);
+        ps.setString(2, password);
 
-            ps.setString(1, email);
-            ps.setString(2, password);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                Usuario u = new Usuario();
+                u.setIdUsuario(rs.getInt("id_usuario"));
+                u.setNombre(rs.getString("nombre"));
+                u.setEmail(rs.getString("email"));
+                u.setContrasena(rs.getString("contrasena"));
+                u.setIdRol(rs.getInt("id_rol"));
+                u.setNombreRol(rs.getString("nombre_rol"));
+                u.setIdArbitro(-1); // default
 
-            try (ResultSet rs = ps.executeQuery()) {
-
-                if (rs.next()) {
-
-                    Usuario u = new Usuario();
-
-                    u.setIdUsuario(rs.getInt("id_usuario"));
-                    u.setNombre(rs.getString("nombre"));
-                    u.setEmail(rs.getString("email"));
-                    u.setContrasena(rs.getString("contrasena"));
-                    u.setIdRol(rs.getInt("id_rol"));
-                    u.setNombreRol(rs.getString("nombre_rol"));
-
-                    return u;
+                // Si es árbitro, buscar su id_arbitro real
+                if (u.getIdRol() == util.Constantes.ROL_ARBITRO) {
+                    u.setIdArbitro(buscarIdArbitro(u.getNombre()));
                 }
+
+                return u;
             }
         }
-
-        return null;
     }
+    return null;
+}
+
+// Método auxiliar: busca en ARBITRO por nombre completo
+private int buscarIdArbitro(String nombreCompleto) throws SQLException {
+    // nombreCompleto = "Pedro Mejia", en ARBITRO está nombre="Pedro" apellido="Mejia"
+    String[] partes = nombreCompleto.trim().split(" ", 2);
+    if (partes.length < 2) return -1;
+
+    String nombre   = partes[0];
+    String apellido = partes[1];
+
+    String sql = "SELECT id_arbitro FROM ARBITRO WHERE nombre=? AND apellido=?";
+    try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+        ps.setString(1, nombre);
+        ps.setString(2, apellido);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt("id_arbitro");
+        }
+    }
+    return -1;
+}
 
     /**
      * LISTAR USUARIOS

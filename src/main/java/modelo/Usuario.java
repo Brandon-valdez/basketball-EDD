@@ -6,7 +6,8 @@ public class Usuario {
     private String email;
     private String contrasena;
     private int    idRol;
-    private String nombreRol; // campo extra para mostrar en vistas
+    private String nombreRol;
+    private int    idArbitro; // -1 si el usuario no es árbitro
 
     public Usuario() {}
 
@@ -16,6 +17,7 @@ public class Usuario {
         this.email      = email;
         this.contrasena = contrasena;
         this.idRol      = idRol;
+        this.idArbitro  = -1;
     }
 
     public int    getIdUsuario()  { return idUsuario; }
@@ -24,6 +26,7 @@ public class Usuario {
     public String getContrasena() { return contrasena; }
     public int    getIdRol()      { return idRol; }
     public String getNombreRol()  { return nombreRol; }
+    public int    getIdArbitro()  { return idArbitro; }
 
     public void setIdUsuario(int idUsuario)       { this.idUsuario  = idUsuario; }
     public void setNombre(String nombre)          { this.nombre     = nombre; }
@@ -31,6 +34,7 @@ public class Usuario {
     public void setContrasena(String contrasena)  { this.contrasena = contrasena; }
     public void setIdRol(int idRol)               { this.idRol      = idRol; }
     public void setNombreRol(String nombreRol)    { this.nombreRol  = nombreRol; }
+    public void setIdArbitro(int idArbitro)       { this.idArbitro  = idArbitro; }
 
     @Override
     public String toString() { return nombre + " (" + email + ")"; }

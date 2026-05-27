@@ -26,10 +26,11 @@ private List<Partido> partidos;
 
 private void cargarPartidos() {
     try {
-        int idArbitro = Sesion.getInstancia().getUsuario().getIdUsuario();
+        int idArbitro = Sesion.getInstancia().getUsuario().getIdArbitro();
+        System.out.println("DEBUG idArbitro = " + idArbitro);
         partidos = partidoDAO.listarPorArbitro(idArbitro);
-        cmbPartidos.removeAllItems();
-        for (Partido p : partidos) {
+        cmbPartidos.removeAllItems(); // ← limpia el combo
+        for (Partido p : partidos) {  // ← llena el combo
             cmbPartidos.addItem(p.getNombreEquipoLocal() + " vs " + p.getNombreEquipoVisit()
                     + " — " + p.getFecha().toLocalDate());
         }

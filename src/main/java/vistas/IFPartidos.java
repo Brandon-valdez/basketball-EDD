@@ -58,7 +58,8 @@ private void configurarTabla() {
 private void cargarPartidos() {
     modeloTabla.setRowCount(0);
     try {
-        int idArbitro = Sesion.getInstancia().getUsuario().getIdUsuario();
+        int idArbitro = Sesion.getInstancia().getUsuario().getIdArbitro(); // ← FIX
+        System.out.println("DEBUG idArbitro = " + idArbitro); // ← temporal para verificar
         List<Partido> lista = partidoDAO.listarPorArbitro(idArbitro);
         for (Partido p : lista) {
             String marcador = "finalizado".equals(p.getEstadoResultado())
@@ -82,13 +83,12 @@ private void cargarPartidos() {
     }
 }
 
-
     public IFPartidos() {   
     initComponents();
     configurarTabla();
     cargarPartidos();
-    
 }
+
 
     
     /**

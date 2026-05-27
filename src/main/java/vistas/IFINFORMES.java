@@ -65,7 +65,7 @@ private void configurarTabla() {
 
 private void cargarPartidos() {
     try {
-        int idArbitro = Sesion.getInstancia().getUsuario().getIdUsuario();
+        int idArbitro = Sesion.getInstancia().getUsuario().getIdArbitro();
         partidos = partidoDAO.listarPorArbitro(idArbitro);
         cmbPartidos.removeAllItems();
         for (Partido p : partidos) {
