@@ -35,17 +35,17 @@ private void configurarTabla() {
     // Configurar renderer personalizado para las celdas
     javax.swing.table.DefaultTableCellRenderer renderer = new javax.swing.table.DefaultTableCellRenderer();
     renderer.setBackground(new java.awt.Color(51, 51, 51));
-    renderer.setForeground(new java.awt.Color(0, 0, 0));
+    renderer.setForeground(new java.awt.Color(255, 255, 255));
     
     for (int i = 0; i < tblPartidos.getColumnCount(); i++) {
         tblPartidos.getColumnModel().getColumn(i).setCellRenderer(renderer);
     }
     
     tblPartidos.setBackground(new java.awt.Color(51, 51, 51));
-    tblPartidos.setForeground(new java.awt.Color(0, 0, 0));
+    tblPartidos.setForeground(new java.awt.Color(255, 255, 255));
     tblPartidos.setGridColor(new java.awt.Color(80, 80, 80));
     tblPartidos.setSelectionBackground(new java.awt.Color(80, 80, 80));
-    tblPartidos.setSelectionForeground(new java.awt.Color(0, 0, 0));
+    tblPartidos.setSelectionForeground(new java.awt.Color(255, 255, 255));
     tblPartidos.getTableHeader().setBackground(new java.awt.Color(51, 51, 51));
     tblPartidos.getTableHeader().setForeground(new java.awt.Color(0, 0, 0));
     // ocultar columna ID

@@ -3,278 +3,479 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
  */
 package vistas;
-import dao.EstadisticaDAO;
+
+import dao.EstadisticaEquipoDAO;
 import dao.PartidoDAO;
-import modelo.Estadistica;
+import modelo.EstadisticaEquipo;
 import modelo.Partido;
 import util.Sesion;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.sql.SQLException;
 import java.util.List;
+
 /**
- *
+ * IFINFORMES - Vista para que el árbitro registre estadísticas por equipo
+ * Permite editar 5 campos por equipo (sin Puntos): Faltas, Triples, Tiros Libres, Rebotes, Asistencias
  * @author Usuario
  */
 public class IFINFORMES extends javax.swing.JInternalFrame {
-private final PartidoDAO partidoDAO = new PartidoDAO();
-private final EstadisticaDAO estadisticaDAO = new EstadisticaDAO();
-private List<Partido> partidos;
-private DefaultTableModel modeloTabla;
+    
+    private final PartidoDAO partidoDAO = new PartidoDAO();
+    private final EstadisticaEquipoDAO estadisticaEquipoDAO = new EstadisticaEquipoDAO();
+    private List<Partido> partidos;
+    private Partido partidoActual;
+
+    // Componentes UI
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JComboBox<String> cmbPartidos;
+    private javax.swing.JButton btnCargar;
+    private javax.swing.JButton btnGuardar;
+    private javax.swing.JPanel panelLocal;
+    private javax.swing.JPanel panelVisitante;
+    private javax.swing.JLabel lblEquipoLocal;
+    private javax.swing.JLabel lblEquipoVisitante;
+
+    // TextFields para equipo local
+    private javax.swing.JTextField txtFaltasLocal;
+    private javax.swing.JTextField txtTriplesLocal;
+    private javax.swing.JTextField txtTirosLibresLocal;
+    private javax.swing.JTextField txtRebotesLocal;
+    private javax.swing.JTextField txtAsistenciasLocal;
+
+    // TextFields para equipo visitante
+    private javax.swing.JTextField txtFaltasVisitante;
+    private javax.swing.JTextField txtTriplesVisitante;
+    private javax.swing.JTextField txtTirosLibresVisitante;
+    private javax.swing.JTextField txtRebotesVisitante;
+    private javax.swing.JTextField txtAsistenciasVisitante;
+
     /**
-     * Creates new form IFINFORMES
+     * Crea nueva instancia de IFINFORMES
      */
     public IFINFORMES() {
         initComponents();
-        configurarTabla();
-    cargarPartidos();
+        cargarPartidos();
     }
-private void configurarTabla() {
-    modeloTabla = new DefaultTableModel(
-        new String[]{"idJugador", "Jugador", "Equipo", "Posición", "Puntos", "Rebotes", "Asistencias", "Faltas", "Minutos"},
-        0
-    ) {
-        @Override
-        public boolean isCellEditable(int row, int col) {
-            return col >= 4; // solo editable desde Puntos en adelante
-        }
-    };
-    tblEstadisticas.setModel(modeloTabla);
-    
-    // Configurar renderer personalizado para las celdas
-    javax.swing.table.DefaultTableCellRenderer renderer = new javax.swing.table.DefaultTableCellRenderer();
-    renderer.setBackground(new java.awt.Color(51, 51, 51));
-    renderer.setForeground(new java.awt.Color(0, 0, 0));
-    
-    for (int i = 0; i < tblEstadisticas.getColumnCount(); i++) {
-        tblEstadisticas.getColumnModel().getColumn(i).setCellRenderer(renderer);
-    }
-    
-    tblEstadisticas.setBackground(new java.awt.Color(51, 51, 51));
-    tblEstadisticas.setForeground(new java.awt.Color(0, 0, 0));
-    tblEstadisticas.setGridColor(new java.awt.Color(80, 80, 80));
-    tblEstadisticas.setSelectionBackground(new java.awt.Color(80, 80, 80));
-    tblEstadisticas.setSelectionForeground(new java.awt.Color(0, 0, 0));
-    tblEstadisticas.getTableHeader().setBackground(new java.awt.Color(51, 51, 51));
-    tblEstadisticas.getTableHeader().setForeground(new java.awt.Color(0, 0, 0));
-    // ocultar columna idJugador
-    tblEstadisticas.getColumnModel().getColumn(0).setMinWidth(0);
-    tblEstadisticas.getColumnModel().getColumn(0).setMaxWidth(0);
-    tblEstadisticas.getTableHeader().setReorderingAllowed(false);
-}
 
-private void cargarPartidos() {
-    try {
-        int idArbitro = Sesion.getInstancia().getUsuario().getIdArbitro();
-        partidos = partidoDAO.listarPorArbitro(idArbitro);
-        cmbPartidos.removeAllItems();
-        for (Partido p : partidos) {
-            cmbPartidos.addItem(p.getNombreEquipoLocal() + " vs " + p.getNombreEquipoVisit()
-                    + " — " + p.getFecha().toLocalDate());
-        }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this,
-                "Error al cargar partidos: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
-    }
-}
-
-private void cargarJugadores() {
-    modeloTabla.setRowCount(0);
-    int idx = cmbPartidos.getSelectedIndex();
-    if (idx < 0) return;
-    try {
-        Partido p = partidos.get(idx);
-        List<Estadistica> lista = estadisticaDAO.listarPorPartido(p.getIdPartido());
-        for (Estadistica e : lista) {
-            modeloTabla.addRow(new Object[]{
-                e.getIdJugador(),
-                e.getNombreJugador(),
-                e.getNombreEquipo(),
-                e.getPosicion(),
-                e.getPuntos(),
-                e.getRebotes(),
-                e.getAsistencias(),
-                e.getFaltas(),
-                e.getMinutosJugados()
-            });
-        }
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this,
-                "Error al cargar jugadores: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
-    }
-}
-
-private void guardarEstadisticas() {
-    int idx = cmbPartidos.getSelectedIndex();
-    if (idx < 0) {
-        JOptionPane.showMessageDialog(this, "Selecciona un partido.", "Aviso", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    try {
-        Partido p = partidos.get(idx);
-        for (int i = 0; i < modeloTabla.getRowCount(); i++) {
-            Estadistica e = new Estadistica();
-            e.setIdJugador((int) modeloTabla.getValueAt(i, 0));
-            e.setIdPartido(p.getIdPartido());
-            e.setPuntos(Integer.parseInt(modeloTabla.getValueAt(i, 4).toString()));
-            e.setRebotes(Integer.parseInt(modeloTabla.getValueAt(i, 5).toString()));
-            e.setAsistencias(Integer.parseInt(modeloTabla.getValueAt(i, 6).toString()));
-            e.setFaltas(Integer.parseInt(modeloTabla.getValueAt(i, 7).toString()));
-            e.setMinutosJugados(Integer.parseInt(modeloTabla.getValueAt(i, 8).toString()));
-            estadisticaDAO.guardar(e);
-        }
-        JOptionPane.showMessageDialog(this, "Estadísticas guardadas.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this,
-                "Error al guardar: " + e.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
-    }
-}
     /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
+     * Carga los partidos asignados al árbitro logueado
      */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void cargarPartidos() {
+        try {
+            int idArbitro = Sesion.getInstancia().getUsuario().getIdArbitro();
+            partidos = partidoDAO.listarPorArbitro(idArbitro);
+            cmbPartidos.removeAllItems();
+            
+            if (partidos != null && !partidos.isEmpty()) {
+                for (Partido p : partidos) {
+                    String item = p.getNombreEquipoLocal() + " vs " + p.getNombreEquipoVisit()
+                            + " — " + p.getFecha().toLocalDate();
+                    cmbPartidos.addItem(item);
+                }
+            } else {
+                cmbPartidos.addItem("No hay partidos asignados");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Error al cargar partidos: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
+    /**
+     * Carga las estadísticas del partido seleccionado para ambos equipos
+     */
+    private void cargarEstadisticas() {
+        int idx = cmbPartidos.getSelectedIndex();
+        if (idx < 0 || partidos == null || partidos.isEmpty()) {
+            limpiarFormulario();
+            return;
+        }
+
+        try {
+            partidoActual = partidos.get(idx);
+            lblEquipoLocal.setText(partidoActual.getNombreEquipoLocal());
+            lblEquipoVisitante.setText(partidoActual.getNombreEquipoVisit());
+
+            // Cargar estadísticas del equipo local
+            EstadisticaEquipo estadisticaLocal = estadisticaEquipoDAO.buscar(
+                    partidoActual.getIdPartido(),
+                    partidoActual.getIdEquipoLocal()
+            );
+            cargarDatosEquipo(estadisticaLocal, true);
+
+            // Cargar estadísticas del equipo visitante
+            EstadisticaEquipo estadisticaVisitante = estadisticaEquipoDAO.buscar(
+                    partidoActual.getIdPartido(),
+                    partidoActual.getIdEquipoVisit()
+            );
+            cargarDatosEquipo(estadisticaVisitante, false);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Error al cargar estadísticas: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Carga los datos de un equipo en sus respectivos campos de texto
+     */
+    private void cargarDatosEquipo(EstadisticaEquipo estadistica, boolean esLocal) {
+        if (estadistica == null) {
+            // Si no existen datos, mostrar ceros
+            if (esLocal) {
+                txtFaltasLocal.setText("0");
+                txtTriplesLocal.setText("0");
+                txtTirosLibresLocal.setText("0");
+                txtRebotesLocal.setText("0");
+                txtAsistenciasLocal.setText("0");
+            } else {
+                txtFaltasVisitante.setText("0");
+                txtTriplesVisitante.setText("0");
+                txtTirosLibresVisitante.setText("0");
+                txtRebotesVisitante.setText("0");
+                txtAsistenciasVisitante.setText("0");
+            }
+        } else {
+            // Cargar los datos existentes
+            if (esLocal) {
+                txtFaltasLocal.setText(String.valueOf(estadistica.getFaltas()));
+                txtTriplesLocal.setText(String.valueOf(estadistica.getTriplesAnotados()));
+                txtTirosLibresLocal.setText(String.valueOf(estadistica.getTirosLibresAnotados()));
+                txtRebotesLocal.setText(String.valueOf(estadistica.getRebotes()));
+                txtAsistenciasLocal.setText(String.valueOf(estadistica.getAsistencias()));
+            } else {
+                txtFaltasVisitante.setText(String.valueOf(estadistica.getFaltas()));
+                txtTriplesVisitante.setText(String.valueOf(estadistica.getTriplesAnotados()));
+                txtTirosLibresVisitante.setText(String.valueOf(estadistica.getTirosLibresAnotados()));
+                txtRebotesVisitante.setText(String.valueOf(estadistica.getRebotes()));
+                txtAsistenciasVisitante.setText(String.valueOf(estadistica.getAsistencias()));
+            }
+        }
+    }
+
+    /**
+     * Limpia todos los campos del formulario
+     */
+    private void limpiarFormulario() {
+        lblEquipoLocal.setText("—");
+        lblEquipoVisitante.setText("—");
+        txtFaltasLocal.setText("0");
+        txtTriplesLocal.setText("0");
+        txtTirosLibresLocal.setText("0");
+        txtRebotesLocal.setText("0");
+        txtAsistenciasLocal.setText("0");
+        txtFaltasVisitante.setText("0");
+        txtTriplesVisitante.setText("0");
+        txtTirosLibresVisitante.setText("0");
+        txtRebotesVisitante.setText("0");
+        txtAsistenciasVisitante.setText("0");
+    }
+
+    /**
+     * Guarda las estadísticas de ambos equipos en la base de datos
+     */
+    private void guardarEstadisticas() {
+        if (partidoActual == null) {
+            JOptionPane.showMessageDialog(this, 
+                    "Selecciona un partido primero.", 
+                    "Aviso", 
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // Guardar estadísticas del equipo local
+            EstadisticaEquipo estadisticaLocal = crearEstadisticaDesdeFormulario(
+                    partidoActual.getIdPartido(),
+                    partidoActual.getIdEquipoLocal(),
+                    true
+            );
+            estadisticaEquipoDAO.guardar(estadisticaLocal);
+
+            // Guardar estadísticas del equipo visitante
+            EstadisticaEquipo estadisticaVisitante = crearEstadisticaDesdeFormulario(
+                    partidoActual.getIdPartido(),
+                    partidoActual.getIdEquipoVisit(),
+                    false
+            );
+            estadisticaEquipoDAO.guardar(estadisticaVisitante);
+
+            JOptionPane.showMessageDialog(this, 
+                    "Estadísticas guardadas exitosamente.", 
+                    "Éxito", 
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Error al guardar: " + e.getMessage(),
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Crea un objeto EstadisticaEquipo con los valores del formulario
+     */
+    private EstadisticaEquipo crearEstadisticaDesdeFormulario(int idPartido, int idEquipo, boolean esLocal) {
+        EstadisticaEquipo e = new EstadisticaEquipo();
+        e.setIdPartido(idPartido);
+        e.setIdEquipo(idEquipo);
+        e.setPuntos(0); // No se usa puntos en esta vista
+
+        try {
+            if (esLocal) {
+                e.setFaltas(parseInt(txtFaltasLocal));
+                e.setTriplesAnotados(parseInt(txtTriplesLocal));
+                e.setTirosLibresAnotados(parseInt(txtTirosLibresLocal));
+                e.setRebotes(parseInt(txtRebotesLocal));
+                e.setAsistencias(parseInt(txtAsistenciasLocal));
+            } else {
+                e.setFaltas(parseInt(txtFaltasVisitante));
+                e.setTriplesAnotados(parseInt(txtTriplesVisitante));
+                e.setTirosLibresAnotados(parseInt(txtTirosLibresVisitante));
+                e.setRebotes(parseInt(txtRebotesVisitante));
+                e.setAsistencias(parseInt(txtAsistenciasVisitante));
+            }
+        } catch (NumberFormatException ex) {
+            throw new RuntimeException("Por favor ingresa solo números.", ex);
+        }
+        return e;
+    }
+
+    /**
+     * Convierte el valor de un JTextField a entero, retorna 0 si está vacío
+     */
+    private int parseInt(javax.swing.JTextField txt) {
+        String text = txt.getText().trim();
+        return text.isEmpty() ? 0 : Integer.parseInt(text);
+    }
+
+    /**
+     * Inicializa los componentes de la GUI
+     */
+    private void initComponents() {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         cmbPartidos = new javax.swing.JComboBox<>();
         btnCargar = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tblEstadisticas = new javax.swing.JTable();
+        panelLocal = new javax.swing.JPanel();
+        lblEquipoLocal = new javax.swing.JLabel();
+        panelVisitante = new javax.swing.JPanel();
+        lblEquipoVisitante = new javax.swing.JLabel();
         btnGuardar = new javax.swing.JButton();
 
+        // Panel principal
         jPanel1.setBackground(new java.awt.Color(0, 0, 0));
 
-        jLabel1.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 48)); // NOI18N
+        // Título
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36));
         jLabel1.setForeground(new java.awt.Color(255, 102, 0));
-        jLabel1.setText("Partido:");
-        jLabel1.setOpaque(true);
+        jLabel1.setText("Informe de Estadísticas por Equipo");
 
+        // ComboBox de partidos
         cmbPartidos.setBackground(new java.awt.Color(255, 102, 0));
-        cmbPartidos.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        cmbPartidos.setFont(new java.awt.Font("Segoe UI", 1, 14));
         cmbPartidos.setForeground(new java.awt.Color(255, 255, 255));
-        cmbPartidos.addActionListener(this::cmbPartidosActionPerformed);
+        cmbPartidos.addActionListener(evt -> cargarEstadisticas());
 
+        // Botón cargar
         btnCargar.setBackground(new java.awt.Color(255, 102, 0));
-        btnCargar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnCargar.setFont(new java.awt.Font("Segoe UI", 1, 14));
         btnCargar.setForeground(new java.awt.Color(255, 255, 255));
-        btnCargar.setText("Cargar jugadores");
-        btnCargar.addActionListener(this::btnCargarActionPerformed);
+        btnCargar.setText("Cargar");
+        btnCargar.addActionListener(evt -> cargarEstadisticas());
 
-        tblEstadisticas.setBackground(new java.awt.Color(0, 0, 0));
-        tblEstadisticas.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        tblEstadisticas.setForeground(new java.awt.Color(255, 255, 255));
-        tblEstadisticas.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tblEstadisticas.setGridColor(new java.awt.Color(255, 102, 0));
-        jScrollPane2.setViewportView(tblEstadisticas);
+        // Panel para equipo local
+        panelLocal.setBackground(new java.awt.Color(0, 0, 0));
+        panelLocal.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 102, 0), 2));
+        lblEquipoLocal.setFont(new java.awt.Font("Segoe UI", 1, 24));
+        lblEquipoLocal.setForeground(new java.awt.Color(255, 102, 0));
+        lblEquipoLocal.setText("—");
 
-        jScrollPane1.setViewportView(jScrollPane2);
+        txtFaltasLocal = new javax.swing.JTextField();
+        txtTriplesLocal = new javax.swing.JTextField();
+        txtTirosLibresLocal = new javax.swing.JTextField();
+        txtRebotesLocal = new javax.swing.JTextField();
+        txtAsistenciasLocal = new javax.swing.JTextField();
+        configurePanel(panelLocal, lblEquipoLocal, txtFaltasLocal, txtTriplesLocal, 
+                       txtTirosLibresLocal, txtRebotesLocal, txtAsistenciasLocal);
 
+        // Panel para equipo visitante
+        panelVisitante.setBackground(new java.awt.Color(0, 0, 0));
+        panelVisitante.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 102, 0), 2));
+        lblEquipoVisitante.setFont(new java.awt.Font("Segoe UI", 1, 24));
+        lblEquipoVisitante.setForeground(new java.awt.Color(255, 102, 0));
+        lblEquipoVisitante.setText("—");
+
+        txtFaltasVisitante = new javax.swing.JTextField();
+        txtTriplesVisitante = new javax.swing.JTextField();
+        txtTirosLibresVisitante = new javax.swing.JTextField();
+        txtRebotesVisitante = new javax.swing.JTextField();
+        txtAsistenciasVisitante = new javax.swing.JTextField();
+        configurePanel(panelVisitante, lblEquipoVisitante, txtFaltasVisitante, txtTriplesVisitante,
+                       txtTirosLibresVisitante, txtRebotesVisitante, txtAsistenciasVisitante);
+
+        // Botón guardar
         btnGuardar.setBackground(new java.awt.Color(255, 102, 0));
-        btnGuardar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnGuardar.setFont(new java.awt.Font("Segoe UI", 1, 16));
         btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
-        btnGuardar.setText("Guardar Estadisticas");
-        btnGuardar.addActionListener(this::btnGuardarActionPerformed);
+        btnGuardar.setText("Guardar");
+        btnGuardar.addActionListener(evt -> guardarEstadisticas());
 
+        // Layout del panel principal
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1)
+                        .addComponent(cmbPartidos, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(cmbPartidos, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(46, 46, 46)
-                        .addComponent(btnCargar, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnCargar))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 610, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnGuardar)))
-                .addContainerGap(32, Short.MAX_VALUE))
+                        .addComponent(panelLocal, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30)
+                        .addComponent(panelVisitante, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(cmbPartidos, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnCargar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addGap(20, 20, 20)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbPartidos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCargar))
+                .addGap(30, 30, 30)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(163, 163, 163)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 237, Short.MAX_VALUE)
-                        .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(114, 114, 114))))
+                    .addComponent(panelLocal, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelVisitante, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(20, 20, 20)
+                .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
+        // Layout principal de la ventana
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        setClosable(true);
+        setResizable(true);
+        pack();
+    }
+
+    /**
+     * Configura el layout de un panel de equipo con sus 5 campos de estadísticas
+     */
+    private void configurePanel(javax.swing.JPanel panel, javax.swing.JLabel lblEquipo,
+            javax.swing.JTextField txtFaltas, javax.swing.JTextField txtTriples,
+            javax.swing.JTextField txtTirosLibres, javax.swing.JTextField txtRebotes,
+            javax.swing.JTextField txtAsistencias) {
+
+        // Crear etiquetas
+        javax.swing.JLabel lblFaltas = new javax.swing.JLabel("Faltas:");
+        lblFaltas.setFont(new java.awt.Font("Segoe UI", 1, 12));
+        lblFaltas.setForeground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.JLabel lblTriples_lbl = new javax.swing.JLabel("Triples:");
+        lblTriples_lbl.setFont(new java.awt.Font("Segoe UI", 1, 12));
+        lblTriples_lbl.setForeground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.JLabel lblTirosLibres = new javax.swing.JLabel("Tiros Libres:");
+        lblTirosLibres.setFont(new java.awt.Font("Segoe UI", 1, 12));
+        lblTirosLibres.setForeground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.JLabel lblRebotes = new javax.swing.JLabel("Rebotes:");
+        lblRebotes.setFont(new java.awt.Font("Segoe UI", 1, 12));
+        lblRebotes.setForeground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.JLabel lblAsistencias = new javax.swing.JLabel("Asistencias:");
+        lblAsistencias.setFont(new java.awt.Font("Segoe UI", 1, 12));
+        lblAsistencias.setForeground(new java.awt.Color(255, 255, 255));
+
+        // Configurar los textfields
+        configureTextField(txtFaltas);
+        configureTextField(txtTriples);
+        configureTextField(txtTirosLibres);
+        configureTextField(txtRebotes);
+        configureTextField(txtAsistencias);
+
+        // Layout del panel
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblEquipo)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblFaltas)
+                            .addComponent(lblTriples_lbl)
+                            .addComponent(lblTirosLibres))
+                        .addGap(15, 15, 15)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtFaltas, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                            .addComponent(txtTriples, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                            .addComponent(txtTirosLibres, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE))
+                        .addGap(30, 30, 30)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblRebotes)
+                            .addComponent(lblAsistencias))
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtRebotes, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                            .addComponent(txtAsistencias, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(lblEquipo)
+                .addGap(15, 15, 15)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblFaltas)
+                    .addComponent(txtFaltas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblRebotes)
+                    .addComponent(txtRebotes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblTriples_lbl)
+                    .addComponent(txtTriples, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblAsistencias)
+                    .addComponent(txtAsistencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblTirosLibres)
+                    .addComponent(txtTirosLibres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+    }
 
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
-
-    private void cmbPartidosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbPartidosActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cmbPartidosActionPerformed
-
-    private void btnCargarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarActionPerformed
-        // TODO add your handling code here:
-        cargarJugadores();
-    }//GEN-LAST:event_btnCargarActionPerformed
-
-    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        // TODO add your handling code here:
-        guardarEstadisticas();
-    }//GEN-LAST:event_btnGuardarActionPerformed
-
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCargar;
-    private javax.swing.JButton btnGuardar;
-    private javax.swing.JComboBox<String> cmbPartidos;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable tblEstadisticas;
-    // End of variables declaration//GEN-END:variables
+    /**
+     * Configura el estilo de un JTextField (color de fondo, texto, fuente)
+     */
+    private void configureTextField(javax.swing.JTextField txt) {
+        txt.setBackground(new java.awt.Color(51, 51, 51));
+        txt.setForeground(new java.awt.Color(255, 255, 255));
+        txt.setFont(new java.awt.Font("Segoe UI", 0, 12));
+    }
 }
+
