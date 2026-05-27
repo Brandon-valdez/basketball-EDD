@@ -404,9 +404,13 @@ private void abrirVentana(javax.swing.JInternalFrame ventana) {
     }//GEN-LAST:event_btnTorneosActionPerformed
 
     private void btnPartidosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPartidosActionPerformed
-        IFPartidos partidos = new IFPartidos();
+        modelo.Usuario usuarioActual = Sesion.getInstancia().getUsuario();
+        boolean esCoach = usuarioActual != null
+                && usuarioActual.getNombreRol() != null
+                && "COACH".equalsIgnoreCase(usuarioActual.getNombreRol().trim());
 
-    abrirVentana(partidos);
+        javax.swing.JInternalFrame partidos = esCoach ? new IFPartidosCoach() : new IFPartidos();
+        abrirVentana(partidos);
 
     }//GEN-LAST:event_btnPartidosActionPerformed
 
