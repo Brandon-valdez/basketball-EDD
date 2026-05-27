@@ -62,6 +62,39 @@ public class ArbitroDAO {
         }
     }
 
+    public boolean insertarConUsuario(Arbitro a, String email, String contrasena) throws SQLException {
+    Connection conn = getConn();
+    conn.setAutoCommit(false);
+    try {
+        // Insertar en ARBITRO
+        String sqlA = "INSERT INTO ARBITRO (nombre, apellido, licencia) VALUES (?,?,?)";
+        try (PreparedStatement ps = conn.prepareStatement(sqlA)) {
+            ps.setString(1, a.getNombre());
+            ps.setString(2, a.getApellido());
+            ps.setString(3, a.getLicencia());
+            ps.executeUpdate();
+        }
+
+        // Insertar en USUARIOS con rol árbitro
+        String sqlU = "INSERT INTO USUARIOS (nombre, email, contrasena, id_rol) VALUES (?, ?, SHA2(?,256), ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sqlU)) {
+            ps.setString(1, a.getNombre() + " " + a.getApellido());
+            ps.setString(2, email);
+            ps.setString(3, contrasena);
+            ps.setInt(4, util.Constantes.ROL_ARBITRO);
+            ps.executeUpdate();
+        }
+
+        conn.commit();
+        return true;
+    } catch (SQLException e) {
+        conn.rollback();
+        throw e;
+    } finally {
+        conn.setAutoCommit(true);
+    }
+}
+    
     public boolean eliminar(int idArbitro) throws SQLException {
         try (PreparedStatement ps = getConn().prepareStatement("DELETE FROM ARBITRO WHERE id_arbitro=?")) {
             ps.setInt(1, idArbitro);

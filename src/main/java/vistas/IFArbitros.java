@@ -5,10 +5,14 @@
 package vistas;
 
 import dao.ArbitroDAO;
+import dao.PartidoDAO;
+import dao.TorneoDAO;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import modelo.Arbitro;
+import modelo.Partido;
+import modelo.Torneo;
 
 /**
  *
@@ -19,7 +23,14 @@ public class IFArbitros extends javax.swing.JInternalFrame {
     /**
      * Creates new form IFArbitros
      */
-    
+    private final PartidoDAO partidoDAO = new PartidoDAO();
+    private final TorneoDAO  torneoDAO  = new TorneoDAO();
+
+    private List<Partido> partidosPendientes;
+    private List<Arbitro> listaArbitros;
+
+    private javax.swing.JComboBox<String> cmbTorneo, cmbPartido, cmbArbitroAsig;
+    private javax.swing.JButton btnAsignar;
     private final ArbitroDAO arbitroDAO = new ArbitroDAO();
     private int idSeleccionado = -1;
     public IFArbitros() {
@@ -54,12 +65,17 @@ public class IFArbitros extends javax.swing.JInternalFrame {
         btnEliminar = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         txtLicencia = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        txtEmail = new javax.swing.JTextField();
+        txtContraseña = new javax.swing.JPasswordField();
         jLabel8 = new javax.swing.JLabel();
         txtBuscar = new javax.swing.JTextField();
         btnBuscar = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblArbitros = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
+        btnAsignarPartido = new javax.swing.JButton();
 
         setBorder(null);
         setClosable(true);
@@ -106,26 +122,45 @@ public class IFArbitros extends javax.swing.JInternalFrame {
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Licencia:");
 
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel7.setText("Email: ");
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel9.setText("Contraseña:");
+
+        txtContraseña.setText("jPasswordField1");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+            .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addComponent(jLabel6)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                            .addComponent(txtLicencia, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel9)
+                                .addComponent(jLabel7))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(txtEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
+                                .addComponent(txtContraseña))))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtApellido))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel6)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel2))
                         .addGap(18, 18, 18)
-                        .addComponent(txtLicencia, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtApellido, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnGuardar, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
                     .addComponent(btnLimpiar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -133,7 +168,7 @@ public class IFArbitros extends javax.swing.JInternalFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                     .addComponent(btnEditar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(56, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -149,9 +184,9 @@ public class IFArbitros extends javax.swing.JInternalFrame {
                             .addComponent(jLabel5)
                             .addComponent(txtApellido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(txtLicencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtLicencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -160,7 +195,15 @@ public class IFArbitros extends javax.swing.JInternalFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnLimpiar, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -204,26 +247,34 @@ public class IFArbitros extends javax.swing.JInternalFrame {
         jLabel1.setForeground(new java.awt.Color(255, 51, 0));
         jLabel1.setText("Gestión de Árbitros");
 
+        btnAsignarPartido.setBackground(new java.awt.Color(255, 102, 0));
+        btnAsignarPartido.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnAsignarPartido.setForeground(new java.awt.Color(255, 255, 255));
+        btnAsignarPartido.setText("Asignar Partido");
+        btnAsignarPartido.addActionListener(this::btnAsignarPartidoActionPerformed);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(0, 33, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(125, 125, 125))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(230, 230, 230)
                 .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(254, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 31, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnAsignarPartido, javax.swing.GroupLayout.PREFERRED_SIZE, 437, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel8)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 164, Short.MAX_VALUE)
+                            .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(125, 125, 125))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -232,14 +283,16 @@ public class IFArbitros extends javax.swing.JInternalFrame {
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnAsignarPartido, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGap(32, 32, 32)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(62, Short.MAX_VALUE))
+                .addGap(66, 66, 66))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -250,13 +303,100 @@ public class IFArbitros extends javax.swing.JInternalFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    
+    private void cargarCombos() {
+    try {
+        listaArbitros = arbitroDAO.listar();
+        cmbArbitroAsig.removeAllItems();
+        for (Arbitro a : listaArbitros) {
+            cmbArbitroAsig.addItem(a.getNombreCompleto() + " [" + a.getLicencia() + "]");
+        }
+        List<Torneo> torneos = torneoDAO.listar();
+        cmbTorneo.removeAllItems();
+        cmbTorneo.addItem("-- Seleccionar torneo --");
+        for (Torneo t : torneos) {
+            cmbTorneo.addItem(t.getIdTorneo() + " | " + t.getNombre());
+        }
+    } catch (java.sql.SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error al cargar combos: " + e.getMessage());
+    }
+}
+
+private void cargarPartidosPendientes() {
+    if (cmbTorneo == null || cmbTorneo.getSelectedIndex() <= 0) return;
+    try {
+        String item = (String) cmbTorneo.getSelectedItem();
+        int idTorneo = Integer.parseInt(item.split("\\|")[0].trim());
+        partidosPendientes = partidoDAO.listarPendientesPorTorneo(idTorneo);
+        cmbPartido.removeAllItems();
+        if (partidosPendientes.isEmpty()) {
+            cmbPartido.addItem("-- Sin partidos pendientes --");
+        } else {
+            for (Partido p : partidosPendientes) {
+                cmbPartido.addItem(
+                    p.getNombreEquipoLocal() + " vs " + p.getNombreEquipoVisit() +
+                    "  (" + p.getFecha().toLocalDate() + ")" +
+                    "  — Árbitro actual: " + p.getNombreArbitro());
+            }
+        }
+    } catch (java.sql.SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error al cargar partidos: " + e.getMessage());
+    }
+}
+
+private void asignarArbitro() {
+    int idxPartido = cmbPartido.getSelectedIndex();
+    int idxArbitro = cmbArbitroAsig.getSelectedIndex();
+
+    if (cmbTorneo.getSelectedIndex() <= 0) {
+        JOptionPane.showMessageDialog(this, "Seleccioná un torneo primero.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    if (partidosPendientes == null || partidosPendientes.isEmpty() || idxPartido < 0) {
+        JOptionPane.showMessageDialog(this, "No hay partido pendiente seleccionado.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    if (idxArbitro < 0) {
+        JOptionPane.showMessageDialog(this, "Seleccioná un árbitro.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    Partido partido = partidosPendientes.get(idxPartido);
+    Arbitro arbitro = listaArbitros.get(idxArbitro);
+
+    if (partido.getIdArbitro() == arbitro.getIdArbitro()) {
+        JOptionPane.showMessageDialog(this,
+            arbitro.getNombreCompleto() + " ya está asignado a este partido.",
+            "Sin cambios", JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+
+    int confirm = JOptionPane.showConfirmDialog(this,
+        "Asignar a " + arbitro.getNombreCompleto() + " al partido:\n" +
+        partido.getNombreEquipoLocal() + " vs " + partido.getNombreEquipoVisit() +
+        "\n¿Confirmar?", "Confirmar asignación", JOptionPane.YES_NO_OPTION);
+    if (confirm != JOptionPane.YES_OPTION) return;
+
+    try {
+        boolean ok = partidoDAO.reasignarArbitro(partido.getIdPartido(), arbitro.getIdArbitro());
+        if (ok) {
+            JOptionPane.showMessageDialog(this, "Árbitro asignado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            cargarPartidosPendientes();
+        } else {
+            JOptionPane.showMessageDialog(this,
+                "No se pudo asignar. El partido puede ya estar finalizado.",
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (java.sql.SQLException e) {
+        JOptionPane.showMessageDialog(this, "Error al asignar: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
 
         private void cargarTabla() {
         try {
@@ -299,38 +439,55 @@ public class IFArbitros extends javax.swing.JInternalFrame {
         txtLicencia.setText("");
         txtBuscar.setText("");
         tblArbitros.clearSelection();
+            txtEmail.setText("");           // nuevo
+    txtContraseña.setText("");      
     
 }
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-         if (txtNombre.getText().isBlank() || txtApellido.getText().isBlank()) {
-            JOptionPane.showMessageDialog(this, "Nombre y apellido son obligatorios.");
-            return;
-        }
+            String nombre   = txtNombre.getText().trim();
+    String apellido = txtApellido.getText().trim();
+    String licencia = txtLicencia.getText().trim();
 
-        Arbitro a = new Arbitro(0,
-            txtNombre.getText().trim(),
-            txtApellido.getText().trim(),
-            txtLicencia.getText().trim()
-        );
+    if (nombre.isBlank() || apellido.isBlank()) {
+        JOptionPane.showMessageDialog(this, "Nombre y apellido son obligatorios.");
+        return;
+    }
 
-        try {
-            if (idSeleccionado == -1) {
-                arbitroDAO.insertar(a);
-                JOptionPane.showMessageDialog(this, "Árbitro guardado.");
-            } else {
-                a.setIdArbitro(idSeleccionado);
-                arbitroDAO.actualizar(a);
-                JOptionPane.showMessageDialog(this, "Árbitro actualizado.");
+    try {
+        if (idSeleccionado == -1) {
+            // CREAR — necesita email y contraseña para el usuario
+            String email      = txtEmail.getText().trim();
+            String contrasena = new String(txtContraseña.getPassword());
+
+            if (email.isBlank()) {
+                JOptionPane.showMessageDialog(this, "El email es obligatorio.");
+                return;
             }
-            limpiar();
-            cargarTabla();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-        }
-    // TODO add your handling code here:
-    }//GEN-LAST:event_btnGuardarActionPerformed
+            if (contrasena.isBlank()) {
+                JOptionPane.showMessageDialog(this, "La contraseña es obligatoria.");
+                return;
+            }
 
+            Arbitro a = new Arbitro(0, nombre, apellido, licencia);
+            arbitroDAO.insertarConUsuario(a, email, contrasena);
+            JOptionPane.showMessageDialog(this, "Árbitro y usuario creados correctamente.");
+
+        } else {
+            // EDITAR — solo actualiza datos del árbitro, no toca el usuario
+            Arbitro a = new Arbitro(idSeleccionado, nombre, apellido, licencia);
+            arbitroDAO.actualizar(a);
+            JOptionPane.showMessageDialog(this, "Árbitro actualizado.");
+        }
+
+        limpiar();
+        cargarTabla();
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    
+    }//GEN-LAST:event_btnGuardarActionPerformed
+    }
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
         limpiar();
     // TODO add your handling code here:
@@ -376,8 +533,16 @@ public class IFArbitros extends javax.swing.JInternalFrame {
     // TODO add your handling code here:
     }//GEN-LAST:event_btnBuscarActionPerformed
 
+    private void btnAsignarPartidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAsignarPartidoActionPerformed
+        DlgAsignarPartido dlg = new DlgAsignarPartido(
+    (java.awt.Frame) javax.swing.SwingUtilities.getWindowAncestor(this), true
+);
+dlg.setVisible(true);// TODO add your handling code here:
+    }//GEN-LAST:event_btnAsignarPartidoActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAsignarPartido;
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
@@ -387,13 +552,17 @@ public class IFArbitros extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable tblArbitros;
     private javax.swing.JTextField txtApellido;
     private javax.swing.JTextField txtBuscar;
+    private javax.swing.JPasswordField txtContraseña;
+    private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtLicencia;
     private javax.swing.JTextField txtNombre;
     // End of variables declaration//GEN-END:variables

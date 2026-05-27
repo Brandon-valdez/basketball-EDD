@@ -141,4 +141,32 @@ public class PartidoDAO {
             return ps.executeUpdate() > 0;
         }
     }
+   /** Reasigna el árbitro de un partido. Solo aplica si el partido está pendiente. */
+public boolean reasignarArbitro(int idPartido, int idArbitro) throws SQLException {
+    String sql = """
+            UPDATE PARTIDOS p
+            JOIN RESULTADOS r ON r.id_partido = p.id_partido
+            SET p.id_arbitro = ?
+            WHERE p.id_partido = ? AND r.estado = 'pendiente'
+            """;
+    try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+        ps.setInt(1, idArbitro);
+        ps.setInt(2, idPartido);
+        return ps.executeUpdate() > 0;
+    }
+}
+
+/** Lista todos los partidos pendientes de un torneo para mostrar en el selector. */
+public List<Partido> listarPendientesPorTorneo(int idTorneo) throws SQLException {
+    List<Partido> lista = new ArrayList<>();
+    String sql = SQL_BASE + " WHERE p.id_torneo=? AND r.estado='pendiente' ORDER BY p.fecha";
+    try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+        ps.setInt(1, idTorneo);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) lista.add(mapear(rs));
+        }
+    }
+    return lista;
+
+    }
 }

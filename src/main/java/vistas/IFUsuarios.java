@@ -45,8 +45,8 @@ public class IFUsuarios extends javax.swing.JInternalFrame {
     private void cargarRoles() {
         // Carga los roles directo desde BD
         try {
-            Connection conn = db.Conexion.getInstancia().getConexion();
-            String sql = "SELECT nombre_rol FROM ROL ORDER BY nombre_rol";
+        Connection conn = db.Conexion.getInstancia().getConexion();
+        String sql = "SELECT nombre_rol FROM ROL WHERE nombre_rol != 'arbitro' ORDER BY nombre_rol";
             Statement st = conn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             cmbRol.removeAllItems();
@@ -306,7 +306,21 @@ public class IFUsuarios extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        if (!validar()) return;
+            if (!validar()) return;
+    
+    // Bloquear creación de árbitros desde aquí
+    try {
+        if (getIdRolSeleccionado() == util.Constantes.ROL_ARBITRO) {
+            JOptionPane.showMessageDialog(this, 
+                "Los árbitros se crean desde el módulo de Árbitros.", 
+                "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+    } catch (java.sql.SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Error al verificar rol: " + ex.getMessage());
+        return;
+    }
+    if (!validar()) return;
         String pass = new String(txtContrasena.getPassword());
         if (pass.isBlank()) {
             JOptionPane.showMessageDialog(this, "La contraseña es requerida para nuevo usuario.");
