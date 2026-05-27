@@ -12,6 +12,9 @@ import util.Sesion;
 import javax.swing.*;
 import java.sql.SQLException;
 import java.util.List;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * IFINFORMES - Vista para que el árbitro registre estadísticas por equipo
@@ -31,6 +34,7 @@ public class IFINFORMES extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox<String> cmbPartidos;
     private javax.swing.JButton btnCargar;
     private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnDescargarEstadisticas;
     private javax.swing.JPanel panelLocal;
     private javax.swing.JPanel panelVisitante;
     private javax.swing.JLabel lblEquipoLocal;
@@ -324,6 +328,14 @@ public class IFINFORMES extends javax.swing.JInternalFrame {
         btnGuardar.setText("Guardar");
         btnGuardar.addActionListener(evt -> guardarEstadisticas());
 
+        // Botón descargar estadísticas
+        btnDescargarEstadisticas = new javax.swing.JButton();
+        btnDescargarEstadisticas.setBackground(new java.awt.Color(220, 20, 60)); // Rojo Crimson
+        btnDescargarEstadisticas.setFont(new java.awt.Font("Segoe UI", 1, 16));
+        btnDescargarEstadisticas.setForeground(new java.awt.Color(255, 255, 255));
+        btnDescargarEstadisticas.setText("Descargar Estadísticas");
+        btnDescargarEstadisticas.addActionListener(evt -> descargarEstadisticas());
+
         // Layout del panel principal
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -341,7 +353,10 @@ public class IFINFORMES extends javax.swing.JInternalFrame {
                         .addComponent(panelLocal, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(30, 30, 30)
                         .addComponent(panelVisitante, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnDescargarEstadisticas, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -358,7 +373,9 @@ public class IFINFORMES extends javax.swing.JInternalFrame {
                     .addComponent(panelLocal, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(panelVisitante, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(20, 20, 20)
-                .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnDescargarEstadisticas, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(20, Short.MAX_VALUE))
         );
 
@@ -377,6 +394,89 @@ public class IFINFORMES extends javax.swing.JInternalFrame {
         setClosable(true);
         setResizable(true);
         pack();
+    }
+
+    /**
+     * Configura el layout de un panel de equipo con sus 5 campos de estadísticas
+     */
+    private void descargarEstadisticas() {
+        if (partidoActual == null) {
+            JOptionPane.showMessageDialog(this, 
+                    "Selecciona un partido primero.", 
+                    "Aviso", 
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // Crear contenido del archivo
+            StringBuilder contenido = new StringBuilder();
+            contenido.append("═══════════════════════════════════════════════════════════\n");
+            contenido.append("         INFORME DE ESTADÍSTICAS DEL PARTIDO\n");
+            contenido.append("═══════════════════════════════════════════════════════════\n\n");
+            
+            contenido.append("INFORMACIÓN DEL PARTIDO:\n");
+            contenido.append("─────────────────────────────────────────────────────────\n");
+            contenido.append("Equipo Local: ").append(partidoActual.getNombreEquipoLocal()).append("\n");
+            contenido.append("Equipo Visitante: ").append(partidoActual.getNombreEquipoVisit()).append("\n");
+            contenido.append("Fecha: ").append(partidoActual.getFecha()).append("\n");
+            contenido.append("Árbitro: ").append(Sesion.getInstancia().getUsuario().getNombre()).append("\n\n");
+
+            // Estadísticas del equipo local
+            contenido.append("ESTADÍSTICAS - ").append(partidoActual.getNombreEquipoLocal()).append(":\n");
+            contenido.append("─────────────────────────────────────────────────────────\n");
+            contenido.append("Faltas: ").append(txtFaltasLocal.getText()).append("\n");
+            contenido.append("Triples Anotados: ").append(txtTriplesLocal.getText()).append("\n");
+            contenido.append("Tiros Libres Anotados: ").append(txtTirosLibresLocal.getText()).append("\n");
+            contenido.append("Rebotes: ").append(txtRebotesLocal.getText()).append("\n");
+            contenido.append("Asistencias: ").append(txtAsistenciasLocal.getText()).append("\n\n");
+
+            // Estadísticas del equipo visitante
+            contenido.append("ESTADÍSTICAS - ").append(partidoActual.getNombreEquipoVisit()).append(":\n");
+            contenido.append("─────────────────────────────────────────────────────────\n");
+            contenido.append("Faltas: ").append(txtFaltasVisitante.getText()).append("\n");
+            contenido.append("Triples Anotados: ").append(txtTriplesVisitante.getText()).append("\n");
+            contenido.append("Tiros Libres Anotados: ").append(txtTirosLibresVisitante.getText()).append("\n");
+            contenido.append("Rebotes: ").append(txtRebotesVisitante.getText()).append("\n");
+            contenido.append("Asistencias: ").append(txtAsistenciasVisitante.getText()).append("\n\n");
+
+            contenido.append("═══════════════════════════════════════════════════════════\n");
+            contenido.append("Fecha de descarga: ").append(new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date())).append("\n");
+            contenido.append("═══════════════════════════════════════════════════════════\n");
+
+            // Crear el archivo en la carpeta Documentos del usuario
+            String rutaDocumentos = System.getProperty("user.home") + File.separator + "Documents";
+            File carpetaDocumentos = new File(rutaDocumentos);
+            if (!carpetaDocumentos.exists()) {
+                carpetaDocumentos.mkdirs();
+            }
+
+            // Generar nombre del archivo con fecha y hora
+            String nombreArchivo = "Estadisticas_" + 
+                    partidoActual.getNombreEquipoLocal().replace(" ", "_") + "_vs_" +
+                    partidoActual.getNombreEquipoVisit().replace(" ", "_") + "_" +
+                    new SimpleDateFormat("dd-MM-yyyy_HHmmss").format(new Date()) + 
+                    ".txt";
+            
+            File archivo = new File(carpetaDocumentos, nombreArchivo);
+
+            // Escribir contenido en el archivo
+            try (FileWriter fw = new FileWriter(archivo);
+                 BufferedWriter bw = new BufferedWriter(fw)) {
+                bw.write(contenido.toString());
+            }
+
+            JOptionPane.showMessageDialog(this, 
+                    "Estadísticas descargadas exitosamente.\n\nArchivo: " + archivo.getAbsolutePath(),
+                    "Éxito", 
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Error al descargar: " + e.getMessage(),
+                    "Error", 
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
