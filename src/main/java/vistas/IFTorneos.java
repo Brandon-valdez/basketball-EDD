@@ -82,54 +82,89 @@ public class IFTorneos extends javax.swing.JInternalFrame {
     }
 
     private void guardar() {
-        if (txtNombre.getText().isBlank()) {
-            JOptionPane.showMessageDialog(this, "El nombre es obligatorio.");
-            return;
-        }
+    boolean hayError = false;
 
-        String fechaStr = ftfFecha.getText().replace(" ", "0");
-        LocalDate fecha;
-        try {
-            fecha = LocalDate.parse(fechaStr, fmtFecha);
-        } catch (DateTimeParseException e) {
-            JOptionPane.showMessageDialog(this, "Fecha inválida. Usá el formato DD/MM/AAAA.");
-            return;
-        }
-
-        LocalTime horaInicio = null, horaFin = null;
-        try {
-            String hi = ftfHoraInicio.getText().replace(" ", "0");
-            String hf = ftfHoraFin.getText().replace(" ", "0");
-            if (!hi.equals("00:00")) horaInicio = LocalTime.parse(hi, fmtHora);
-            if (!hf.equals("00:00")) horaFin    = LocalTime.parse(hf, fmtHora);
-        } catch (DateTimeParseException e) {
-            JOptionPane.showMessageDialog(this, "Hora inválida. Usá el formato HH:MM.");
-            return;
-        }
-
-        Torneo t = new Torneo();
-        t.setNombre(txtNombre.getText().trim());
-        t.setUbicacion(txtUbicacion.getText().trim());
-        t.setEstado(cmbEstado.getSelectedItem().toString().toLowerCase());
-        t.setFechaInicio(fecha);
-        t.setHoraInicio(horaInicio);
-        t.setHoraFin(horaFin);
-
-        try {
-            if (idSeleccionado == -1) {
-                torneoDAO.insertar(t);
-                JOptionPane.showMessageDialog(this, "Torneo guardado.");
-            } else {
-                t.setIdTorneo(idSeleccionado);
-                torneoDAO.actualizar(t);
-                JOptionPane.showMessageDialog(this, "Torneo actualizado.");
-            }
-            limpiar();
-            cargarTabla();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-        }
+    // ── Validar Nombre ────────────────────────────────
+    if (txtNombre.getText().isBlank()) {
+        txtNombre.setBackground(new java.awt.Color(255, 80, 80));
+        hayError = true;
+    } else if (txtNombre.getText().trim().length() < 3) {
+        txtNombre.setBackground(new java.awt.Color(255, 80, 80));
+        JOptionPane.showMessageDialog(this, "El nombre debe tener al menos 3 caracteres.");
+        hayError = true;
+    } else {
+        txtNombre.setBackground(java.awt.Color.WHITE);
     }
+
+    // ── Validar Ubicación ─────────────────────────────
+    if (txtUbicacion.getText().isBlank()) {
+        txtUbicacion.setBackground(new java.awt.Color(255, 80, 80));
+        hayError = true;
+    } else {
+        txtUbicacion.setBackground(java.awt.Color.WHITE);
+    }
+
+    // ── Validar Fecha ─────────────────────────────────
+    String fechaStr = ftfFecha.getText().replace(" ", "0");
+    LocalDate fecha = null;
+    try {
+        fecha = LocalDate.parse(fechaStr, fmtFecha);
+        ftfFecha.setBackground(java.awt.Color.WHITE);
+    } catch (DateTimeParseException e) {
+        ftfFecha.setBackground(new java.awt.Color(255, 80, 80));
+        JOptionPane.showMessageDialog(this, "Fecha inválida. Usá el formato DD/MM/AAAA.");
+        hayError = true;
+    }
+
+    // ── Validar Horas ─────────────────────────────────
+    LocalTime horaInicio = null, horaFin = null;
+    try {
+        String hi = ftfHoraInicio.getText().replace(" ", "0");
+        String hf = ftfHoraFin.getText().replace(" ", "0");
+        if (!hi.equals("00:00")) horaInicio = LocalTime.parse(hi, fmtHora);
+        if (!hf.equals("00:00")) horaFin    = LocalTime.parse(hf, fmtHora);
+        ftfHoraInicio.setBackground(java.awt.Color.WHITE);
+        ftfHoraFin.setBackground(java.awt.Color.WHITE);
+    } catch (DateTimeParseException e) {
+        ftfHoraInicio.setBackground(new java.awt.Color(255, 80, 80));
+        ftfHoraFin.setBackground(new java.awt.Color(255, 80, 80));
+        JOptionPane.showMessageDialog(this, "Hora inválida. Usá el formato HH:MM.");
+        hayError = true;
+    }
+
+    // ── Validar que hora fin > hora inicio ────────────
+    if (horaInicio != null && horaFin != null && !horaFin.isAfter(horaInicio)) {
+        ftfHoraFin.setBackground(new java.awt.Color(255, 80, 80));
+        JOptionPane.showMessageDialog(this, "La hora de fin debe ser posterior a la hora de inicio.");
+        hayError = true;
+    }
+
+    if (hayError) return;
+
+    // ── Guardar ───────────────────────────────────────
+    Torneo t = new Torneo();
+    t.setNombre(txtNombre.getText().trim());
+    t.setUbicacion(txtUbicacion.getText().trim());
+    t.setEstado(cmbEstado.getSelectedItem().toString().toLowerCase());
+    t.setFechaInicio(fecha);
+    t.setHoraInicio(horaInicio);
+    t.setHoraFin(horaFin);
+
+    try {
+        if (idSeleccionado == -1) {
+            torneoDAO.insertar(t);
+            JOptionPane.showMessageDialog(this, "Torneo guardado.");
+        } else {
+            t.setIdTorneo(idSeleccionado);
+            torneoDAO.actualizar(t);
+            JOptionPane.showMessageDialog(this, "Torneo actualizado.");
+        }
+        limpiar();
+        cargarTabla();
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
+}
 
     private void seleccionarFila() {
         int fila = tblTorneos.getSelectedRow();

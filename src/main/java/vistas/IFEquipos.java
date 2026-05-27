@@ -164,10 +164,11 @@ public class IFEquipos extends javax.swing.JInternalFrame {
                         .addComponent(txtCiudad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2)
-                            .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel2)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(cmbDirector, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -384,30 +385,51 @@ private void cargarTabla() {
     }
 
         private void seleccionarFila() {
-            int fila = tblEquipos.getSelectedRow();
-            if (fila == -1) return;
-            idSeleccionado = (int) tblEquipos.getValueAt(fila, 0);
-            txtNombre.setText(tblEquipos.getValueAt(fila, 1).toString());
-            txtCiudad.setText(tblEquipos.getValueAt(fila, 2).toString());
+    int fila = tblEquipos.getSelectedRow();
+    if (fila == -1) return;
 
-            // Fecha
-            try {
-                String fechaStr = tblEquipos.getValueAt(fila, 4).toString(); // "2024-01-10"
-                java.time.LocalDate ld = java.time.LocalDate.parse(fechaStr);
-                java.util.Date fecha = java.util.Date.from(
-                    ld.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
-                );
-                spnFecha.setValue(fecha);
-            } catch (Exception ex) {
-                spnFecha.setValue(new java.util.Date());
-            }
-        }
+    idSeleccionado = (int) tblEquipos.getValueAt(fila, 0);
+    txtNombre.setText(tblEquipos.getValueAt(fila, 1).toString());
+    txtCiudad.setText(tblEquipos.getValueAt(fila, 2).toString());
 
-    private void cargarEdicion() {
-        if (idSeleccionado == -1) {
-            JOptionPane.showMessageDialog(this, "Seleccioná un equipo de la tabla primero.");
+    // ── Cargar director en el combo ───────────────────
+    String nombreDirector = tblEquipos.getValueAt(fila, 3) != null
+        ? tblEquipos.getValueAt(fila, 3).toString() : "";
+    for (int i = 0; i < cmbDirector.getItemCount(); i++) {
+        if (cmbDirector.getItemAt(i).contains(nombreDirector)) {
+            cmbDirector.setSelectedIndex(i);
+            break;
         }
     }
+
+    // ── Cargar fecha ──────────────────────────────────
+    try {
+        String fechaStr = tblEquipos.getValueAt(fila, 4).toString();
+        java.time.LocalDate ld = java.time.LocalDate.parse(fechaStr);
+        java.util.Date fecha = java.util.Date.from(
+            ld.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+        );
+        spnFecha.setValue(fecha);
+    } catch (Exception ex) {
+        spnFecha.setValue(new java.util.Date());
+    }
+
+    // ── Feedback visual — resaltar fila seleccionada ──
+    tblEquipos.setRowSelectionInterval(fila, fila);
+}
+
+    private void cargarEdicion() {
+    if (idSeleccionado == -1) {
+        JOptionPane.showMessageDialog(this,
+            "Seleccioná un equipo de la tabla primero.",
+            "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    // Los datos ya están cargados por seleccionarFila()
+    JOptionPane.showMessageDialog(this,
+        "Equipo cargado para edición. Modificá los campos y presioná Guardar.",
+        "Editar", JOptionPane.INFORMATION_MESSAGE);
+}
 
     private void eliminar() {
         if (idSeleccionado == -1) {

@@ -50,7 +50,14 @@
             <artifactId>jcalendar</artifactId>
             <version>1.4</version>
         </dependency>
+        <!-- JFreeChart para gráficas estadísticas -->
+<dependency>
+    <groupId>org.jfree</groupId>
+    <artifactId>jfreechart</artifactId>
+    <version>1.5.4</version>
+</dependency>
     </dependencies>
+    
 
     <build>
         <plugins>

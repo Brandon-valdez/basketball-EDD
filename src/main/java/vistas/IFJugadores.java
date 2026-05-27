@@ -33,7 +33,7 @@ import javax.swing.table.JTableHeader;
  * @author 1
  */
 public class IFJugadores extends javax.swing.JInternalFrame {
-
+    private javax.swing.table.DefaultTableModel modeloCompleto;
     private String rutaImagenSeleccionada = "";
     private Jugador jugadorSeleccionado = null;
 
@@ -75,6 +75,11 @@ public class IFJugadores extends javax.swing.JInternalFrame {
             }
         });
         cargarJugadores();
+        txtBuscar.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+    @Override public void insertUpdate(javax.swing.event.DocumentEvent e)  { filtrarTabla(); }
+    @Override public void removeUpdate(javax.swing.event.DocumentEvent e)  { filtrarTabla(); }
+    @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { filtrarTabla(); }
+});
     }
 
     private void cargarSeleccionEnFormulario() {
@@ -196,12 +201,14 @@ public class IFJugadores extends javax.swing.JInternalFrame {
         try {
             if (!Sesion.getInstancia().estaLogueado() || Sesion.getInstancia().getUsuario() == null) {
                 tablaJugadores.setModel(modelo);
+                
                 return;
             }
 
             Equipo equipo = new EquipoDAO().buscarPorUsuario(Sesion.getInstancia().getUsuario().getIdUsuario());
             if (equipo == null) {
                 tablaJugadores.setModel(modelo);
+                
                 return;
             }
 
@@ -215,6 +222,7 @@ public class IFJugadores extends javax.swing.JInternalFrame {
                 });
             }
             tablaJugadores.setModel(modelo);
+            modeloCompleto = modelo;
             tablaJugadores.clearSelection();
             limpiarFormulario();
         } catch (SQLException ex) {
@@ -478,6 +486,9 @@ public class IFJugadores extends javax.swing.JInternalFrame {
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        txtBuscar = new javax.swing.JTextField();
 
         setBorder(null);
         setClosable(true);
@@ -654,22 +665,50 @@ public class IFJugadores extends javax.swing.JInternalFrame {
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
+        jPanel4.setBackground(new java.awt.Color(51, 51, 51));
+
+        jLabel1.setText("Buscar:");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(32, 32, 32)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(43, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(13, 13, 13)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(17, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(58, 58, 58)
+                .addGap(83, 83, 83)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addGap(288, 288, 288))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(74, 74, 74))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 594, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(50, 50, 50))))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(74, 74, 74))))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 594, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(45, 45, 45))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -678,9 +717,11 @@ public class IFJugadores extends javax.swing.JInternalFrame {
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(22, 22, 22)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(380, Short.MAX_VALUE))
+                .addContainerGap(293, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -705,6 +746,7 @@ public class IFJugadores extends javax.swing.JInternalFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -715,11 +757,37 @@ public class IFJugadores extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblImagen;
     private javax.swing.JSpinner spDorsal;
     private javax.swing.JTable tablaJugadores;
     private javax.swing.JTextField txtApellido;
+    private javax.swing.JTextField txtBuscar;
     private javax.swing.JTextField txtNombre;
     // End of variables declaration//GEN-END:variables
+
+private void filtrarTabla() {
+    String texto = txtBuscar.getText().toLowerCase().trim();
+    DefaultTableModel modeloFiltrado = new DefaultTableModel(
+        new Object[]{"Nombre", "Apellido", "Fecha nac.", "Posición", "Dorsal"}, 0) {
+        @Override public boolean isCellEditable(int r, int c) { return false; }
+    };
+    if (modeloCompleto == null) return;
+    for (int i = 0; i < modeloCompleto.getRowCount(); i++) {
+        String nombre   = modeloCompleto.getValueAt(i, 0).toString().toLowerCase();
+        String apellido = modeloCompleto.getValueAt(i, 1).toString().toLowerCase();
+        String posicion = modeloCompleto.getValueAt(i, 3).toString().toLowerCase();
+        if (nombre.contains(texto) || apellido.contains(texto) || posicion.contains(texto)) {
+            modeloFiltrado.addRow(new Object[]{
+                modeloCompleto.getValueAt(i, 0),
+                modeloCompleto.getValueAt(i, 1),
+                modeloCompleto.getValueAt(i, 2),
+                modeloCompleto.getValueAt(i, 3),
+                modeloCompleto.getValueAt(i, 4)
+            });
+        }
+    }
+    tablaJugadores.setModel(modeloFiltrado);
+}
 }

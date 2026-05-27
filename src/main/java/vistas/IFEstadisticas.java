@@ -3,18 +3,53 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JInternalFrame.java to edit this template
  */
 package vistas;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.draw.LineSeparator;
+import dao.InformeDAO;
+import dao.PartidoDAO;
+import dao.TorneoDAO;
+import modelo.Partido;
+import modelo.Torneo;
+import util.Sesion;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.BorderLayout;
+import java.io.FileOutputStream;
+import java.sql.SQLException;
+import java.util.List;
 
-/**
- *
- * @author 1
- */
+
 public class IFEstadisticas extends javax.swing.JInternalFrame {
-
-    /**
-     * Creates new form IFEstadisticas
-     */
+    private final PartidoDAO partidoDAO = new PartidoDAO();
+    private final TorneoDAO  torneoDAO  = new TorneoDAO();
+private final InformeDAO informeDAO = new InformeDAO();
+private List<Torneo> torneos;
     public IFEstadisticas() {
         initComponents();
+        cargarTorneos();
+        // Abrir maximizado dentro del JDesktopPane
+    try {
+        setMaximum(true);
+        // Hacer que el contenido principal tenga scroll si se necesita
+getContentPane().setLayout(new BorderLayout());
+javax.swing.JScrollPane scrollPrincipal = new javax.swing.JScrollPane(jPanel1);
+scrollPrincipal.setBorder(null);
+getContentPane().add(scrollPrincipal, BorderLayout.CENTER);
+    } catch (java.beans.PropertyVetoException e) {
+        // ignorar
+    }
     }
 
     /**
@@ -26,26 +61,574 @@ public class IFEstadisticas extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        panelGrafico = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tablaEstadisticas = new javax.swing.JTable();
+        jPanel2 = new javax.swing.JPanel();
+        btnGenerar = new javax.swing.JButton();
+        cmbTorneo = new javax.swing.JComboBox<>();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        btnGenerarPDF = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tablaPartidos = new javax.swing.JTable();
+
         setBorder(null);
         setClosable(true);
+        setMaximizable(true);
         setResizable(true);
         setAutoscrolls(true);
+
+        jPanel1.setBackground(new java.awt.Color(0, 0, 0));
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel1.setText("Estadísticas por Torneo");
+
+        javax.swing.GroupLayout panelGraficoLayout = new javax.swing.GroupLayout(panelGrafico);
+        panelGrafico.setLayout(panelGraficoLayout);
+        panelGraficoLayout.setHorizontalGroup(
+            panelGraficoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        panelGraficoLayout.setVerticalGroup(
+            panelGraficoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 205, Short.MAX_VALUE)
+        );
+
+        tablaEstadisticas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(tablaEstadisticas);
+
+        jPanel2.setBackground(new java.awt.Color(51, 51, 51));
+
+        btnGenerar.setBackground(new java.awt.Color(255, 102, 0));
+        btnGenerar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnGenerar.setForeground(new java.awt.Color(255, 255, 255));
+        btnGenerar.setText("Ver Estadísticas");
+        btnGenerar.addActionListener(this::btnGenerarActionPerformed);
+
+        cmbTorneo.setBackground(new java.awt.Color(255, 102, 0));
+        cmbTorneo.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        cmbTorneo.setForeground(new java.awt.Color(255, 255, 255));
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel2.setText("Torneo:");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(199, Short.MAX_VALUE)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbTorneo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnGenerar)
+                .addGap(194, 194, 194))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnGenerar, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(cmbTorneo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+
+        jPanel3.setBackground(new java.awt.Color(51, 51, 51));
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel3.setText("Exportar:");
+
+        btnGenerarPDF.setBackground(new java.awt.Color(255, 51, 0));
+        btnGenerarPDF.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnGenerarPDF.setForeground(new java.awt.Color(255, 255, 255));
+        btnGenerarPDF.setText("Generar PDF");
+        btnGenerarPDF.addActionListener(this::btnGenerarPDFActionPerformed);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnGenerarPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(241, 241, 241))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(btnGenerarPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(18, Short.MAX_VALUE))
+        );
+
+        tablaPartidos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(tablaPartidos);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(65, 65, 65)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addGap(267, 267, 267))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(62, 62, 62)
+                                .addComponent(panelGrafico, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(47, 47, 47))))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(13, 13, 13)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(panelGrafico, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(18, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 406, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 286, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnGenerarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarActionPerformed
+        generarGrafico();
+    }//GEN-LAST:event_btnGenerarActionPerformed
+
+    private void btnGenerarPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarPDFActionPerformed
+        generarPDF();
+    }//GEN-LAST:event_btnGenerarPDFActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnGenerar;
+    private javax.swing.JButton btnGenerarPDF;
+    private javax.swing.JComboBox<String> cmbTorneo;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JPanel panelGrafico;
+    private javax.swing.JTable tablaEstadisticas;
+    private javax.swing.JTable tablaPartidos;
     // End of variables declaration//GEN-END:variables
+
+    private void cargarTorneos() {
+    try {
+        torneos = torneoDAO.listar();
+        cmbTorneo.removeAllItems();
+        if (torneos == null || torneos.isEmpty()) {
+            cmbTorneo.addItem("No hay torneos");
+            btnGenerar.setEnabled(false);
+            return;
+        }
+        for (Torneo t : torneos) {
+            cmbTorneo.addItem(t.getNombre() + " [" + t.getEstado() + "]");
+        }
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this,
+            "Error al cargar torneos: " + e.getMessage());
+    }
+}
+
+private void generarGrafico() {
+    int idx = cmbTorneo.getSelectedIndex();
+    if (idx < 0 || torneos == null) return;
+
+    Torneo t = torneos.get(idx);
+
+    try {
+        Object[][] datos = informeDAO.tablaPosiciones(t.getIdTorneo());
+
+        if (datos == null || datos.length == 0) {
+            JOptionPane.showMessageDialog(this,
+                "No hay datos de posiciones para este torneo.",
+                "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // ── Llenar tabla ─────────────────────────────────────
+        String[] columnas = {"Equipo", "V", "D", "PJ",
+                             "Pts favor", "Pts contra", "Diferencia"};
+        DefaultTableModel model = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+        for (Object[] fila : datos) {
+            model.addRow(fila);
+        }
+        tablaEstadisticas.setModel(model);
+        
+
+        // Estilo de la tabla
+        tablaEstadisticas.setBackground(new java.awt.Color(30, 30, 30));
+tablaEstadisticas.setForeground(java.awt.Color.WHITE);
+tablaEstadisticas.setGridColor(new java.awt.Color(80, 80, 80));
+tablaEstadisticas.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+tablaEstadisticas.getTableHeader().setBackground(new java.awt.Color(255, 102, 0));
+tablaEstadisticas.getTableHeader().setForeground(java.awt.Color.WHITE);
+tablaEstadisticas.getTableHeader().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+        cargarPartidosEnTabla(t.getIdTorneo());
+
+        // ── Llenar gráfico ───────────────────────────────────
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        for (Object[] fila : datos) {
+            String equipo = fila[0] != null ? fila[0].toString() : "?";
+            dataset.addValue(toInt(fila[1]), "Victorias",     equipo);
+            dataset.addValue(toInt(fila[2]), "Derrotas",      equipo);
+            dataset.addValue(toInt(fila[4]), "Pts a favor",   equipo);
+            dataset.addValue(toInt(fila[5]), "Pts en contra", equipo);
+        }
+
+        JFreeChart chart = ChartFactory.createBarChart(
+            "Posiciones — " + t.getNombre(),
+            "Equipo", "Valor", dataset,
+            PlotOrientation.VERTICAL, true, true, false);
+
+        chart.setBackgroundPaint(java.awt.Color.BLACK);
+chart.getTitle().setPaint(new java.awt.Color(255, 102, 0));
+chart.getTitle().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 13));
+
+CategoryPlot plot = chart.getCategoryPlot();
+plot.setBackgroundPaint(new java.awt.Color(30, 30, 30));
+plot.setDomainGridlinePaint(new java.awt.Color(80, 80, 80));
+plot.setRangeGridlinePaint(new java.awt.Color(80, 80, 80));
+plot.setOutlineVisible(false);
+
+CategoryAxis eje = plot.getDomainAxis();
+eje.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
+eje.setLabelPaint(java.awt.Color.WHITE);
+eje.setTickLabelPaint(java.awt.Color.WHITE);
+eje.setTickLabelFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 11));
+plot.getRangeAxis().setLabelPaint(java.awt.Color.WHITE);
+plot.getRangeAxis().setTickLabelPaint(java.awt.Color.WHITE);
+
+BarRenderer r = (BarRenderer) plot.getRenderer();
+r.setMaximumBarWidth(0.12);
+java.awt.Color[] colores = {
+    new java.awt.Color(255, 102,  0),
+    new java.awt.Color( 30, 144, 255),
+    new java.awt.Color( 50, 205,  50),
+    new java.awt.Color(255, 215,   0)
+};
+for (int i = 0; i < dataset.getRowCount(); i++) {
+    r.setSeriesPaint(i, colores[i % colores.length]);
+}
+chart.getLegend().setBackgroundPaint(new java.awt.Color(20, 20, 20));
+chart.getLegend().setItemPaint(java.awt.Color.WHITE);
+
+panelGrafico.removeAll();
+panelGrafico.setLayout(new BorderLayout());
+panelGrafico.setBackground(java.awt.Color.BLACK);
+ChartPanel cp = new ChartPanel(chart);
+cp.setBackground(java.awt.Color.BLACK);
+cp.setPreferredSize(new java.awt.Dimension(500, 220));
+panelGrafico.add(cp, BorderLayout.CENTER);
+panelGrafico.revalidate();
+panelGrafico.setPreferredSize(new java.awt.Dimension(500, 220));
+panelGrafico.repaint();
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this,
+            "Error al cargar estadísticas: " + e.getMessage());
+    }
+}
+
+private int toInt(Object o) {
+    if (o == null) return 0;
+    try { return Integer.parseInt(o.toString()); }
+    catch (NumberFormatException e) { return 0; }
+}
+    private void cargarPartidosEnTabla(int idTorneo) {
+    try {
+        Object[][] historial = informeDAO.historialPorTorneo(idTorneo);
+        String[] cols = {"Fecha", "Local", "Pts L", "Pts V", "Visitante", "Ganador"};
+        javax.swing.table.DefaultTableModel model =
+            new javax.swing.table.DefaultTableModel(cols, 0) {
+                @Override public boolean isCellEditable(int r, int c) { return false; }
+            };
+
+        if (historial != null) {
+            for (Object[] fila : historial) {
+                // historial cols: torneo,fecha,local,ptsL,ptsV,visitante,estado,ganador
+                model.addRow(new Object[]{
+                    fila[1], fila[2], fila[3], fila[4], fila[5], fila[7]
+                });
+            }
+        }
+
+        tablaPartidos.setModel(model);
+tablaPartidos.setBackground(new java.awt.Color(30, 30, 30));
+tablaPartidos.setForeground(java.awt.Color.WHITE);
+tablaPartidos.setGridColor(new java.awt.Color(80, 80, 80));
+tablaPartidos.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+tablaPartidos.getTableHeader().setBackground(new java.awt.Color(255, 102, 0));
+tablaPartidos.getTableHeader().setForeground(java.awt.Color.WHITE);
+tablaPartidos.getTableHeader().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+tablaPartidos.setRowHeight(24);
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(this,
+            "Error al cargar partidos: " + e.getMessage());
+    }
+}
+
+private void generarPDF() {
+    int idx = cmbTorneo.getSelectedIndex();
+    if (idx < 0 || torneos == null) {
+        JOptionPane.showMessageDialog(this,
+            "Seleccioná un torneo primero.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    Torneo t = torneos.get(idx);
+
+    // Elegir dónde guardar
+    JFileChooser chooser = new JFileChooser();
+    chooser.setDialogTitle("Guardar reporte PDF");
+    chooser.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)", "pdf"));
+    chooser.setSelectedFile(
+        new java.io.File("Reporte_" + t.getNombre().replace(" ", "_") + ".pdf"));
+
+    if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+    String ruta = chooser.getSelectedFile().getAbsolutePath();
+    if (!ruta.toLowerCase().endsWith(".pdf")) ruta += ".pdf";
+
+    try {
+        Document doc = new Document(PageSize.A4);
+        PdfWriter.getInstance(doc, new FileOutputStream(ruta));
+        doc.open();
+
+        // ── Fuentes ──────────────────────────────────────────
+        com.itextpdf.text.Font fTitulo = new com.itextpdf.text.Font(Font.FontFamily.HELVETICA, 20, Font.BOLD,
+                                 new BaseColor(255, 102, 0));
+        Font fSeccion = new Font(Font.FontFamily.HELVETICA, 13, Font.BOLD,
+                                 BaseColor.WHITE);
+        Font fHeader  = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD,
+                                 BaseColor.WHITE);
+        Font fCelda   = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL,
+                                 BaseColor.WHITE);
+        Font fSub     = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL,
+                                 new BaseColor(180, 180, 180));
+
+        BaseColor negro     = new BaseColor(0, 0, 0);
+        BaseColor grisOscuro= new BaseColor(30, 30, 30);
+        BaseColor naranja   = new BaseColor(255, 102, 0);
+
+        // ── Fondo negro de página ─────────────────────────────
+        doc.add(new Paragraph(" "));
+
+        // ── Título ───────────────────────────────────────────
+        Paragraph titulo = new Paragraph("BKB MANAGER — Reporte de Torneo", fTitulo);
+        titulo.setAlignment(Element.ALIGN_CENTER);
+        titulo.setSpacingAfter(4);
+        doc.add(titulo);
+
+        Paragraph subtitulo = new Paragraph(t.getNombre(), fSeccion);
+        subtitulo.setAlignment(Element.ALIGN_CENTER);
+        subtitulo.setSpacingAfter(16);
+        doc.add(subtitulo);
+
+        // Línea separadora naranja
+        LineSeparator linea = new LineSeparator(2, 100, naranja,
+                                               Element.ALIGN_CENTER, -2);
+        doc.add(new Chunk(linea));
+        doc.add(new Paragraph(" "));
+
+        // ── Resumen del torneo ────────────────────────────────
+        Paragraph secResumen = new Paragraph("Información del torneo", fSeccion);
+        secResumen.setSpacingAfter(6);
+        doc.add(secResumen);
+
+        java.util.Map<String, String> resumen = informeDAO.resumenTorneo(t.getIdTorneo());
+        PdfPTable tblResumen = new PdfPTable(2);
+        tblResumen.setWidthPercentage(60);
+        tblResumen.setHorizontalAlignment(Element.ALIGN_LEFT);
+        tblResumen.setSpacingAfter(16);
+
+        for (java.util.Map.Entry<String, String> entry : resumen.entrySet()) {
+            PdfPCell cLabel = new PdfPCell(new Phrase(entry.getKey(), fSub));
+            PdfPCell cValor = new PdfPCell(new Phrase(
+                entry.getValue() != null ? entry.getValue() : "—", fCelda));
+            cLabel.setBackgroundColor(grisOscuro);
+            cValor.setBackgroundColor(grisOscuro);
+            cLabel.setBorderColor(new BaseColor(80, 80, 80));
+            cValor.setBorderColor(new BaseColor(80, 80, 80));
+            cLabel.setPadding(5);
+            cValor.setPadding(5);
+            tblResumen.addCell(cLabel);
+            tblResumen.addCell(cValor);
+        }
+        doc.add(tblResumen);
+
+        // ── Tabla de posiciones ───────────────────────────────
+        Paragraph secPos = new Paragraph("Tabla de posiciones", fSeccion);
+        secPos.setSpacingAfter(6);
+        doc.add(secPos);
+
+        Object[][] posiciones = informeDAO.tablaPosiciones(t.getIdTorneo());
+        String[] colsPos = {"Equipo", "V", "D", "PJ",
+                            "Pts favor", "Pts contra", "Diferencia"};
+
+        PdfPTable tblPos = new PdfPTable(colsPos.length);
+        tblPos.setWidthPercentage(100);
+        tblPos.setSpacingAfter(16);
+
+        // Headers naranja
+        for (String col : colsPos) {
+            PdfPCell h = new PdfPCell(new Phrase(col, fHeader));
+            h.setBackgroundColor(naranja);
+            h.setBorderColor(negro);
+            h.setPadding(6);
+            h.setHorizontalAlignment(Element.ALIGN_CENTER);
+            tblPos.addCell(h);
+        }
+
+        if (posiciones != null) {
+            boolean alterno = false;
+            for (Object[] fila : posiciones) {
+                BaseColor bg = alterno ? grisOscuro : new BaseColor(15, 15, 15);
+                alterno = !alterno;
+                for (Object val : fila) {
+                    PdfPCell c = new PdfPCell(
+                        new Phrase(val != null ? val.toString() : "—", fCelda));
+                    c.setBackgroundColor(bg);
+                    c.setBorderColor(new BaseColor(60, 60, 60));
+                    c.setPadding(5);
+                    c.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    tblPos.addCell(c);
+                }
+            }
+        }
+        doc.add(tblPos);
+
+        // ── Historial de partidos ─────────────────────────────
+        Paragraph secHist = new Paragraph("Partidos jugados", fSeccion);
+        secHist.setSpacingAfter(6);
+        doc.add(secHist);
+
+        Object[][] historial = informeDAO.historialPorTorneo(t.getIdTorneo());
+        String[] colsHist = {"Fecha", "Local", "Pts L",
+                             "Pts V", "Visitante", "Ganador"};
+
+        PdfPTable tblHist = new PdfPTable(colsHist.length);
+        tblHist.setWidthPercentage(100);
+        tblHist.setSpacingAfter(12);
+
+        for (String col : colsHist) {
+            PdfPCell h = new PdfPCell(new Phrase(col, fHeader));
+            h.setBackgroundColor(naranja);
+            h.setBorderColor(negro);
+            h.setPadding(6);
+            h.setHorizontalAlignment(Element.ALIGN_CENTER);
+            tblHist.addCell(h);
+        }
+
+        if (historial != null) {
+            boolean alterno = false;
+            for (Object[] fila : historial) {
+                // cols: torneo,fecha,local,ptsL,ptsV,visitante,estado,ganador
+                Object[] filaFiltrada = {
+                    fila[1], fila[2], fila[3], fila[4], fila[5], fila[7]
+                };
+                BaseColor bg = alterno ? grisOscuro : new BaseColor(15, 15, 15);
+                alterno = !alterno;
+                for (Object val : filaFiltrada) {
+                    PdfPCell c = new PdfPCell(
+                        new Phrase(val != null ? val.toString() : "—", fCelda));
+                    c.setBackgroundColor(bg);
+                    c.setBorderColor(new BaseColor(60, 60, 60));
+                    c.setPadding(5);
+                    c.setHorizontalAlignment(Element.ALIGN_CENTER);
+                    tblHist.addCell(c);
+                }
+            }
+        }
+        doc.add(tblHist);
+
+        // ── Pie de página ─────────────────────────────────────
+        doc.add(new Chunk(linea));
+        Paragraph pie = new Paragraph(
+            "Generado por BKB Manager — " +
+            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date()),
+            fSub);
+        pie.setAlignment(Element.ALIGN_RIGHT);
+        pie.setSpacingBefore(6);
+        doc.add(pie);
+
+        doc.close();
+
+        JOptionPane.showMessageDialog(this,
+            "PDF generado exitosamente.\n" + ruta,
+            "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this,
+            "Error al generar PDF: " + e.getMessage(),
+            "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
 }

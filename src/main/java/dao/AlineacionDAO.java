@@ -124,4 +124,60 @@ public class AlineacionDAO {
         a.setTipoDb(rs.getString("tipo"));
         return a;
     }
+    /**
+ * Guarda la alineación y sus suplentes en una sola transacción.
+ * Si falla cualquier INSERT, hace rollback completo.
+ */
+public boolean guardarConSuplentes(Alineacion alineacion,
+                                   List<modelo.Suplente> suplentes) throws SQLException {
+    Connection conn = getConn();
+    try {
+        // ── Inicio de transacción ─────────────────────
+        conn.setAutoCommit(false);
+
+        // 1. Insertar o actualizar alineación
+        Alineacion existente = buscarPorPartidoYEquipo(
+            alineacion.getIdPartido(), alineacion.getIdEquipo());
+
+        if (existente == null) {
+            insertar(alineacion);
+        } else {
+            alineacion.setIdAlineacion(existente.getIdAlineacion());
+            actualizar(alineacion);
+        }
+
+        // 2. Borrar suplentes anteriores y reinsertar
+        String sqlDel = "DELETE FROM SUPLENTES WHERE id_alineacion=?";
+        try (PreparedStatement ps = conn.prepareStatement(sqlDel)) {
+            ps.setInt(1, alineacion.getIdAlineacion());
+            ps.executeUpdate();
+        }
+
+        String sqlIns = "INSERT INTO SUPLENTES (id_alineacion, id_jugador, orden_ingreso) VALUES (?,?,?)";
+        try (PreparedStatement ps = conn.prepareStatement(sqlIns)) {
+            for (modelo.Suplente s : suplentes) {
+                ps.setInt(1, alineacion.getIdAlineacion());
+                ps.setInt(2, s.getIdJugador());
+                if (s.getOrdenIngreso() == null)
+                    ps.setNull(3, java.sql.Types.INTEGER);
+                else
+                    ps.setInt(3, s.getOrdenIngreso());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        }
+
+        // ── Commit ────────────────────────────────────
+        conn.commit();
+        return true;
+
+    } catch (SQLException e) {
+        // ── Rollback si algo falló ────────────────────
+        try { conn.rollback(); } catch (SQLException ex) { /* ignorar */ }
+        throw e;
+    } finally {
+        // ── Restaurar autocommit ──────────────────────
+        try { conn.setAutoCommit(true); } catch (SQLException ex) { /* ignorar */ }
+    }
+}
 }
